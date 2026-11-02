@@ -45,8 +45,10 @@ type approxkfnModel struct {
 }
 
 func (m *approxkfnModel) allocApproxKFNModel(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetApproxKFNModelPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -57,8 +59,10 @@ func (m *approxkfnModel) getApproxKFNModel(params *params, identifier string) {
 func setApproxKFNModel(params* params,
                            identifier string,
                            ptr *approxkfnModel) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetApproxKFNModelPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type cfModel struct {
@@ -66,8 +70,10 @@ type cfModel struct {
 }
 
 func (m *cfModel) allocCFModel(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetCFModelPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -78,8 +84,10 @@ func (m *cfModel) getCFModel(params *params, identifier string) {
 func setCFModel(params* params,
                            identifier string,
                            ptr *cfModel) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetCFModelPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type dTree struct {
@@ -87,8 +95,10 @@ type dTree struct {
 }
 
 func (m *dTree) allocDTree(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetDTreePtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -99,8 +109,10 @@ func (m *dTree) getDTree(params *params, identifier string) {
 func setDTree(params* params,
                            identifier string,
                            ptr *dTree) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetDTreePtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type fastmksModel struct {
@@ -108,8 +120,10 @@ type fastmksModel struct {
 }
 
 func (m *fastmksModel) allocFastMKSModel(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetFastMKSModelPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -120,8 +134,10 @@ func (m *fastmksModel) getFastMKSModel(params *params, identifier string) {
 func setFastMKSModel(params* params,
                            identifier string,
                            ptr *fastmksModel) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetFastMKSModelPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type gmm struct {
@@ -129,8 +145,10 @@ type gmm struct {
 }
 
 func (m *gmm) allocGMM(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetGMMPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -141,8 +159,10 @@ func (m *gmm) getGMM(params *params, identifier string) {
 func setGMM(params* params,
                            identifier string,
                            ptr *gmm) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetGMMPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type hmmModel struct {
@@ -150,8 +170,10 @@ type hmmModel struct {
 }
 
 func (m *hmmModel) allocHMMModel(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetHMMModelPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -162,8 +184,10 @@ func (m *hmmModel) getHMMModel(params *params, identifier string) {
 func setHMMModel(params* params,
                            identifier string,
                            ptr *hmmModel) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetHMMModelPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type hoeffdingTreeModel struct {
@@ -171,8 +195,10 @@ type hoeffdingTreeModel struct {
 }
 
 func (m *hoeffdingTreeModel) allocHoeffdingTreeModel(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetHoeffdingTreeModelPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -183,8 +209,10 @@ func (m *hoeffdingTreeModel) getHoeffdingTreeModel(params *params, identifier st
 func setHoeffdingTreeModel(params* params,
                            identifier string,
                            ptr *hoeffdingTreeModel) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetHoeffdingTreeModelPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type kdeModel struct {
@@ -192,8 +220,10 @@ type kdeModel struct {
 }
 
 func (m *kdeModel) allocKDEModel(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetKDEModelPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -204,8 +234,10 @@ func (m *kdeModel) getKDEModel(params *params, identifier string) {
 func setKDEModel(params* params,
                            identifier string,
                            ptr *kdeModel) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetKDEModelPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type bayesianLinearRegression struct {
@@ -213,8 +245,10 @@ type bayesianLinearRegression struct {
 }
 
 func (m *bayesianLinearRegression) allocBayesianLinearRegression(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetBayesianLinearRegressionPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -225,8 +259,10 @@ func (m *bayesianLinearRegression) getBayesianLinearRegression(params *params, i
 func setBayesianLinearRegression(params* params,
                            identifier string,
                            ptr *bayesianLinearRegression) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetBayesianLinearRegressionPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type lars struct {
@@ -234,8 +270,10 @@ type lars struct {
 }
 
 func (m *lars) allocLARS(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetLARSPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -246,8 +284,10 @@ func (m *lars) getLARS(params *params, identifier string) {
 func setLARS(params* params,
                            identifier string,
                            ptr *lars) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetLARSPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type linearsvmModel struct {
@@ -255,8 +295,10 @@ type linearsvmModel struct {
 }
 
 func (m *linearsvmModel) allocLinearSVMModel(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetLinearSVMModelPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -267,8 +309,10 @@ func (m *linearsvmModel) getLinearSVMModel(params *params, identifier string) {
 func setLinearSVMModel(params* params,
                            identifier string,
                            ptr *linearsvmModel) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetLinearSVMModelPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type localCoordinateCoding struct {
@@ -276,8 +320,10 @@ type localCoordinateCoding struct {
 }
 
 func (m *localCoordinateCoding) allocLocalCoordinateCoding(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetLocalCoordinateCodingPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -288,8 +334,10 @@ func (m *localCoordinateCoding) getLocalCoordinateCoding(params *params, identif
 func setLocalCoordinateCoding(params* params,
                            identifier string,
                            ptr *localCoordinateCoding) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetLocalCoordinateCodingPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type logisticRegression struct {
@@ -297,8 +345,10 @@ type logisticRegression struct {
 }
 
 func (m *logisticRegression) allocLogisticRegression(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetLogisticRegressionPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -309,8 +359,10 @@ func (m *logisticRegression) getLogisticRegression(params *params, identifier st
 func setLogisticRegression(params* params,
                            identifier string,
                            ptr *logisticRegression) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetLogisticRegressionPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type lshSearch struct {
@@ -318,8 +370,10 @@ type lshSearch struct {
 }
 
 func (m *lshSearch) allocLSHSearch(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetLSHSearchPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -330,8 +384,10 @@ func (m *lshSearch) getLSHSearch(params *params, identifier string) {
 func setLSHSearch(params* params,
                            identifier string,
                            ptr *lshSearch) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetLSHSearchPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type nbcModel struct {
@@ -339,8 +395,10 @@ type nbcModel struct {
 }
 
 func (m *nbcModel) allocNBCModel(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetNBCModelPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -351,8 +409,10 @@ func (m *nbcModel) getNBCModel(params *params, identifier string) {
 func setNBCModel(params* params,
                            identifier string,
                            ptr *nbcModel) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetNBCModelPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type knnModel struct {
@@ -360,8 +420,10 @@ type knnModel struct {
 }
 
 func (m *knnModel) allocKNNModel(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetKNNModelPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -372,8 +434,10 @@ func (m *knnModel) getKNNModel(params *params, identifier string) {
 func setKNNModel(params* params,
                            identifier string,
                            ptr *knnModel) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetKNNModelPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type kfnModel struct {
@@ -381,8 +445,10 @@ type kfnModel struct {
 }
 
 func (m *kfnModel) allocKFNModel(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetKFNModelPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -393,8 +459,10 @@ func (m *kfnModel) getKFNModel(params *params, identifier string) {
 func setKFNModel(params* params,
                            identifier string,
                            ptr *kfnModel) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetKFNModelPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type perceptronModel struct {
@@ -402,8 +470,10 @@ type perceptronModel struct {
 }
 
 func (m *perceptronModel) allocPerceptronModel(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetPerceptronModelPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -414,8 +484,10 @@ func (m *perceptronModel) getPerceptronModel(params *params, identifier string) 
 func setPerceptronModel(params* params,
                            identifier string,
                            ptr *perceptronModel) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetPerceptronModelPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type scalingModel struct {
@@ -423,8 +495,10 @@ type scalingModel struct {
 }
 
 func (m *scalingModel) allocScalingModel(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetScalingModelPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -435,8 +509,10 @@ func (m *scalingModel) getScalingModel(params *params, identifier string) {
 func setScalingModel(params* params,
                            identifier string,
                            ptr *scalingModel) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetScalingModelPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type raModel struct {
@@ -444,8 +520,10 @@ type raModel struct {
 }
 
 func (m *raModel) allocRAModel(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetRAModelPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -456,8 +534,10 @@ func (m *raModel) getRAModel(params *params, identifier string) {
 func setRAModel(params* params,
                            identifier string,
                            ptr *raModel) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetRAModelPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type softmaxRegression struct {
@@ -465,8 +545,10 @@ type softmaxRegression struct {
 }
 
 func (m *softmaxRegression) allocSoftmaxRegression(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetSoftmaxRegressionPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -477,8 +559,10 @@ func (m *softmaxRegression) getSoftmaxRegression(params *params, identifier stri
 func setSoftmaxRegression(params* params,
                            identifier string,
                            ptr *softmaxRegression) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetSoftmaxRegressionPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type sparseCoding struct {
@@ -486,8 +570,10 @@ type sparseCoding struct {
 }
 
 func (m *sparseCoding) allocSparseCoding(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetSparseCodingPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -498,8 +584,10 @@ func (m *sparseCoding) getSparseCoding(params *params, identifier string) {
 func setSparseCoding(params* params,
                            identifier string,
                            ptr *sparseCoding) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetSparseCodingPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type randomForestModel struct {
@@ -507,8 +595,10 @@ type randomForestModel struct {
 }
 
 func (m *randomForestModel) allocRandomForestModel(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetRandomForestModelPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -519,8 +609,10 @@ func (m *randomForestModel) getRandomForestModel(params *params, identifier stri
 func setRandomForestModel(params* params,
                            identifier string,
                            ptr *randomForestModel) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetRandomForestModelPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type decisionTreeModel struct {
@@ -528,8 +620,10 @@ type decisionTreeModel struct {
 }
 
 func (m *decisionTreeModel) allocDecisionTreeModel(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetDecisionTreeModelPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -540,8 +634,10 @@ func (m *decisionTreeModel) getDecisionTreeModel(params *params, identifier stri
 func setDecisionTreeModel(params* params,
                            identifier string,
                            ptr *decisionTreeModel) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetDecisionTreeModelPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type adaBoostModel struct {
@@ -549,8 +645,10 @@ type adaBoostModel struct {
 }
 
 func (m *adaBoostModel) allocAdaBoostModel(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetAdaBoostModelPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -561,8 +659,10 @@ func (m *adaBoostModel) getAdaBoostModel(params *params, identifier string) {
 func setAdaBoostModel(params* params,
                            identifier string,
                            ptr *adaBoostModel) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetAdaBoostModelPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 
 type linearRegression struct {
@@ -570,8 +670,10 @@ type linearRegression struct {
 }
 
 func (m *linearRegression) allocLinearRegression(params *params, identifier string) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   m.mem = C.mlpackGetLinearRegressionPtr(params.mem,
-      C.CString(identifier))
+      id)
   runtime.KeepAlive(m)
 }
 
@@ -582,7 +684,9 @@ func (m *linearRegression) getLinearRegression(params *params, identifier string
 func setLinearRegression(params* params,
                            identifier string,
                            ptr *linearRegression) {
+  id := C.CString(identifier)
+  defer freeCString(id)
   C.mlpackSetLinearRegressionPtr(params.mem,
-      C.CString(identifier), ptr.mem)
+      id, ptr.mem)
 }
 

@@ -107,7 +107,9 @@ func AdaboostOptions() *AdaboostOptionalParam {
  */
 func Adaboost(param *AdaboostOptionalParam) (adaBoostModel, *mat.Dense, *mat.Dense) {
   params := getParams("adaboost")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -175,9 +177,6 @@ func Adaboost(param *AdaboostOptionalParam) (adaBoostModel, *mat.Dense, *mat.Den
   predictions := predictionsPtr.armaToGonumUrow(params, "predictions")
   var probabilitiesPtr mlpackArma
   probabilities := probabilitiesPtr.armaToGonumMat(params, "probabilities")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return outputModel, predictions, probabilities
 }

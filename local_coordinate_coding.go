@@ -119,7 +119,9 @@ func LocalCoordinateCodingOptions() *LocalCoordinateCodingOptionalParam {
  */
 func LocalCoordinateCoding(param *LocalCoordinateCodingOptionalParam) (*mat.Dense, *mat.Dense, localCoordinateCoding) {
   params := getParams("local_coordinate_coding")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -205,9 +207,6 @@ func LocalCoordinateCoding(param *LocalCoordinateCodingOptionalParam) (*mat.Dens
   dictionary := dictionaryPtr.armaToGonumMat(params, "dictionary")
   var outputModel localCoordinateCoding
   outputModel.getLocalCoordinateCoding(params, "output_model")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return codes, dictionary, outputModel
 }

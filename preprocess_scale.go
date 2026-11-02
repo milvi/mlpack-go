@@ -115,7 +115,9 @@ func PreprocessScaleOptions() *PreprocessScaleOptionalParam {
  */
 func PreprocessScale(input *mat.Dense, param *PreprocessScaleOptionalParam) (*mat.Dense, scalingModel) {
   params := getParams("preprocess_scale")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -184,9 +186,6 @@ func PreprocessScale(input *mat.Dense, param *PreprocessScaleOptionalParam) (*ma
   output := outputPtr.armaToGonumMat(params, "output")
   var outputModel scalingModel
   outputModel.getScalingModel(params, "output_model")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return output, outputModel
 }

@@ -122,7 +122,9 @@ func KrannOptions() *KrannOptionalParam {
  */
 func Krann(param *KrannOptionalParam) (*mat.Dense, *mat.Dense, raModel) {
   params := getParams("krann")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -238,9 +240,6 @@ func Krann(param *KrannOptionalParam) (*mat.Dense, *mat.Dense, raModel) {
   neighbors := neighborsPtr.armaToGonumUmat(params, "neighbors")
   var outputModel raModel
   outputModel.getRAModel(params, "output_model")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return distances, neighbors, outputModel
 }

@@ -116,7 +116,9 @@ func KernelPcaOptions() *KernelPcaOptionalParam {
  */
 func KernelPca(input *mat.Dense, kernel string, param *KernelPcaOptionalParam) (*mat.Dense) {
   params := getParams("kernel_pca")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -192,9 +194,6 @@ func KernelPca(input *mat.Dense, kernel string, param *KernelPcaOptionalParam) (
   // Initialize result variable and get output.
   var outputPtr mlpackArma
   output := outputPtr.armaToGonumMat(params, "output")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return output
 }

@@ -144,7 +144,9 @@ func NcaOptions() *NcaOptionalParam {
  */
 func Nca(input *mat.Dense, param *NcaOptionalParam) (*mat.Dense) {
   params := getParams("nca")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -258,9 +260,6 @@ func Nca(input *mat.Dense, param *NcaOptionalParam) (*mat.Dense) {
   // Initialize result variable and get output.
   var outputPtr mlpackArma
   output := outputPtr.armaToGonumMat(params, "output")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return output
 }

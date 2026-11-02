@@ -96,7 +96,9 @@ func LinearRegressionOptions() *LinearRegressionOptionalParam {
  */
 func LinearRegression(param *LinearRegressionOptionalParam) (linearRegression, *mat.Dense) {
   params := getParams("linear_regression")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -149,9 +151,6 @@ func LinearRegression(param *LinearRegressionOptionalParam) (linearRegression, *
   outputModel.getLinearRegression(params, "output_model")
   var outputPredictionsPtr mlpackArma
   outputPredictions := outputPredictionsPtr.armaToGonumRow(params, "output_predictions")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return outputModel, outputPredictions
 }

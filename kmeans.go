@@ -147,7 +147,9 @@ func KmeansOptions() *KmeansOptionalParam {
  */
 func Kmeans(clusters int, input *mat.Dense, param *KmeansOptionalParam) (*mat.Dense, *mat.Dense) {
   params := getParams("kmeans")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -250,9 +252,6 @@ func Kmeans(clusters int, input *mat.Dense, param *KmeansOptionalParam) (*mat.De
   centroid := centroidPtr.armaToGonumMat(params, "centroid")
   var outputPtr mlpackArma
   output := outputPtr.armaToGonumMat(params, "output")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return centroid, output
 }

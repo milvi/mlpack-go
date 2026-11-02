@@ -104,7 +104,9 @@ func PerceptronOptions() *PerceptronOptionalParam {
  */
 func Perceptron(param *PerceptronOptionalParam) (perceptronModel, *mat.Dense) {
   params := getParams("perceptron")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -157,9 +159,6 @@ func Perceptron(param *PerceptronOptionalParam) (perceptronModel, *mat.Dense) {
   outputModel.getPerceptronModel(params, "output_model")
   var predictionsPtr mlpackArma
   predictions := predictionsPtr.armaToGonumUrow(params, "predictions")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return outputModel, predictions
 }

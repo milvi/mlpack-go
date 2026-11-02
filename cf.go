@@ -181,7 +181,9 @@ func CfOptions() *CfOptionalParam {
  */
 func Cf(param *CfOptionalParam) (*mat.Dense, cfModel) {
   params := getParams("cf")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -300,9 +302,6 @@ func Cf(param *CfOptionalParam) (*mat.Dense, cfModel) {
   output := outputPtr.armaToGonumUmat(params, "output")
   var outputModel cfModel
   outputModel.getCFModel(params, "output_model")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return output, outputModel
 }

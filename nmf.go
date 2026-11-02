@@ -90,7 +90,9 @@ func NmfOptions() *NmfOptionalParam {
  */
 func Nmf(input *mat.Dense, rank int, param *NmfOptionalParam) (*mat.Dense, *mat.Dense) {
   params := getParams("nmf")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -157,9 +159,6 @@ func Nmf(input *mat.Dense, rank int, param *NmfOptionalParam) (*mat.Dense, *mat.
   h := hPtr.armaToGonumMat(params, "h")
   var wPtr mlpackArma
   w := wPtr.armaToGonumMat(params, "w")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return h, w
 }

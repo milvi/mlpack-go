@@ -85,7 +85,9 @@ func HmmTrainOptions() *HmmTrainOptionalParam {
  */
 func HmmTrain(inputFile string, param *HmmTrainOptionalParam) (hmmModel) {
   params := getParams("hmm_train")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -157,9 +159,6 @@ func HmmTrain(inputFile string, param *HmmTrainOptionalParam) (hmmModel) {
   // Initialize result variable and get output.
   var outputModel hmmModel
   outputModel.getHMMModel(params, "output_model")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return outputModel
 }

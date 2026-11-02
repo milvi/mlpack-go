@@ -71,7 +71,9 @@ func PreprocessBinarizeOptions() *PreprocessBinarizeOptionalParam {
  */
 func PreprocessBinarize(input *mat.Dense, param *PreprocessBinarizeOptionalParam) (*mat.Dense) {
   params := getParams("preprocess_binarize")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -107,9 +109,6 @@ func PreprocessBinarize(input *mat.Dense, param *PreprocessBinarizeOptionalParam
   // Initialize result variable and get output.
   var outputPtr mlpackArma
   output := outputPtr.armaToGonumMat(params, "output")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return output
 }

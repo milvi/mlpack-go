@@ -79,7 +79,9 @@ func RadicalOptions() *RadicalOptionalParam {
  */
 func Radical(input *mat.Dense, param *RadicalOptionalParam) (*mat.Dense, *mat.Dense) {
   params := getParams("radical")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -142,9 +144,6 @@ func Radical(input *mat.Dense, param *RadicalOptionalParam) (*mat.Dense, *mat.De
   outputIc := outputIcPtr.armaToGonumMat(params, "output_ic")
   var outputUnmixingPtr mlpackArma
   outputUnmixing := outputUnmixingPtr.armaToGonumMat(params, "output_unmixing")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return outputIc, outputUnmixing
 }

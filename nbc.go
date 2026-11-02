@@ -95,7 +95,9 @@ func NbcOptions() *NbcOptionalParam {
  */
 func Nbc(param *NbcOptionalParam) (nbcModel, *mat.Dense, *mat.Dense) {
   params := getParams("nbc")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -151,9 +153,6 @@ func Nbc(param *NbcOptionalParam) (nbcModel, *mat.Dense, *mat.Dense) {
   predictions := predictionsPtr.armaToGonumUrow(params, "predictions")
   var probabilitiesPtr mlpackArma
   probabilities := probabilitiesPtr.armaToGonumMat(params, "probabilities")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return outputModel, predictions, probabilities
 }

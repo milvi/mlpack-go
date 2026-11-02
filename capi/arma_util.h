@@ -21,6 +21,11 @@
 extern "C" {
 #endif
 
+// Copie sans détachement ; kind : mat, umat, row, urow, col, ucol, tuple (0 à 6).
+bool mlpackCopyParamMat(void* params, const char* identifier,
+                       double* destination, const size_t length, const int kind);
+
+
 /**
  * Pass Gonum Dense pointer and wrap an Armadillo mat around it.
  */

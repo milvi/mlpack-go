@@ -1,417 +1,161 @@
 package mlpack
 
 /*
-#cgo CFLAGS: -I. -I/capi
-#cgo LDFLAGS: -L. -lmlpack_go_util
-#include <stdlib.h>
-#include <stdio.h>
-#include <capi/io_util.h>
+#cgo CFLAGS: -I.
+#cgo LDFLAGS: -L${SRCDIR} -lmlpack_go_util
 #include <capi/arma_util.h>
 */
 import "C"
 
 import (
-  "runtime"
-  "unsafe"
-
-  "gonum.org/v1/gonum/mat"
+	"fmt"
+	"gonum.org/v1/gonum/mat"
+	"unsafe"
 )
 
-type mlpackArma struct {
-  mem unsafe.Pointer
-}
+type mlpackArma struct{}
 
-// A Tuple containing `float64` data (data) along with a boolean array
-// (Categoricals) indicating which dimensions are categorical (represented by
-// `true`) and which are numeric (represented by `false`).  The number of
-// elements in the boolean array should be the same as the dimensionality of
-// the data matrix.  It is expected that each row of the matrix corresponds to a
-// single data point when calling mlpack bindings.
+// Chaque ligne est un point ; Categoricals décrit les dimensions.
 type matrixWithInfo struct {
-  Categoricals []bool
-  Data *mat.Dense
+	Categoricals []bool
+	Data         *mat.Dense
 }
 
-// A function used for initializing matrixWithInfo Tuple.
-func DataAndInfo() *matrixWithInfo {
-  return &matrixWithInfo {
-    Categoricals: nil,
-    Data: nil,
-  }
+func DataAndInfo() *matrixWithInfo { return &matrixWithInfo{} }
+
+// Une vue Gonum avec un pas différent de sa largeur est compactée une fois.
+// Le chemin contigu conserve son stockage initial, épinglé jusqu'à cleanParams.
+func compactData(m *mat.Dense) (r, c int, data []float64) {
+	if m == nil {
+		panic("mlpack : matrice d'entrée absente")
+	}
+	r, c = m.Dims()
+	if r == 0 || c == 0 {
+		panic("mlpack : matrice d'entrée vide")
+	}
+	raw := m.RawMatrix()
+	if raw.Stride == c || r == 1 {
+		return r, c, raw.Data[:r*c]
+	}
+	data = make([]float64, r*c)
+	for i := 0; i < r; i++ {
+		copy(data[i*c:(i+1)*c], raw.Data[i*raw.Stride:i*raw.Stride+c])
+	}
+	return r, c, data
 }
 
-// Allocates a C memory Pointer via cgo and registers the finalizer
-// in order to free the C memory once the input has been registered in Go.
-func (m *mlpackArma) allocArmaPtrMat(p *params, identifier string) {
-  m.mem = C.mlpackArmaPtrMat(p.mem, C.CString(identifier))
-  runtime.KeepAlive(m)
-}
-
-// Allocates a C memory Pointer via cgo and registers the finalizer
-// in order to free the C memory once the input has been registered in Go.
-func (m *mlpackArma) allocArmaPtrUmat(p *params, identifier string) {
-  m.mem = C.mlpackArmaPtrUmat(p.mem, C.CString(identifier))
-  runtime.KeepAlive(m)
-}
-
-// Allocates a C memory Pointer via cgo and registers the finalizer
-// in order to free the C memory once the input has been registered in Go.
-func (m *mlpackArma) allocArmaPtrRow(p *params, identifier string) {
-  m.mem = C.mlpackArmaPtrRow(p.mem, C.CString(identifier))
-  runtime.KeepAlive(m)
-}
-
-// Allocates a C memory Pointer via cgo and registers the finalizer
-// in order to free the C memory once the input has been registered in Go.
-func (m *mlpackArma) allocArmaPtrUrow(p *params, identifier string) {
-  m.mem = C.mlpackArmaPtrUrow(p.mem, C.CString(identifier))
-  runtime.KeepAlive(m)
-}
-
-// Allocates a C memory Pointer via cgo and registers the finalizer
-// in order to free the C memory once the input has been registered in Go.
-func (m *mlpackArma) allocArmaPtrCol(p *params, identifier string) {
-  m.mem = C.mlpackArmaPtrCol(p.mem, C.CString(identifier))
-  runtime.KeepAlive(m)
-}
-
-// Allocates a C memory Pointer via cgo and registers the finalizer
-// in order to free the C memory once the input has been registered in Go.
-func (m *mlpackArma) allocArmaPtrUcol(p *params, identifier string) {
-  m.mem = C.mlpackArmaPtrUcol(p.mem, C.CString(identifier))
-  runtime.KeepAlive(m)
-}
-
-// Allocates a C memory Pointer via cgo and registers the finalizer
-// in order to free the C memory once the input has been registered in Go.
-func (m *mlpackArma) allocArmaPtrMatWithInfo(p *params,
-                                             identifier string) {
-  m.mem = C.mlpackArmaPtrMatWithInfoPtr(p.mem, C.CString(identifier))
-  runtime.KeepAlive(m)
-}
-
-// Passes a Gonum matrix to C by using the underlying data from the Gonum matrix.
 func gonumToArmaMat(p *params, identifier string, m *mat.Dense, trans bool) {
-  // Get the number of elements in the Armadillo column.
-  r, c := m.Dims()
-  blas64General := m.RawMatrix()
-  data := blas64General.Data
-
-  // Pass pointer of the underlying matrix to mlpack.
-  ptr := unsafe.Pointer(&data[0])
-  C.mlpackToArmaMat(p.mem, C.CString(identifier), (*C.double)(ptr),
-      C.size_t(c), C.size_t(r), C.bool(trans))
+	r, c, data := compactData(m)
+	p.pins.Pin(&data[0])
+	id := C.CString(identifier)
+	defer freeCString(id)
+	C.mlpackToArmaMat(p.mem, id, (*C.double)(unsafe.Pointer(&data[0])), C.size_t(c), C.size_t(r), C.bool(trans))
 }
-
-// Passes a Gonum matrix to C by using the underlying data from the Gonum matrix.
 func gonumToArmaUmat(p *params, identifier string, m *mat.Dense) {
-  // Get the number of elements in the Armadillo column.
-  r, c := m.Dims()
-  blas64General := m.RawMatrix()
-  data := blas64General.Data
+	r, c, data := compactData(m)
+	id := C.CString(identifier)
+	defer freeCString(id)
+	// La conversion native vers size_t copie les données pendant cet appel.
+	C.mlpackToArmaUmat(p.mem, id, (*C.double)(unsafe.Pointer(&data[0])), C.size_t(c), C.size_t(r))
+}
+func gonumToArmaVector(p *params, identifier string, m *mat.Dense, kind int) {
+	r, c, data := compactData(m)
+	if r != 1 && c != 1 {
+		panic("mlpack : une seule ligne ou colonne est requise")
+	}
+	p.pins.Pin(&data[0])
+	id := C.CString(identifier)
+	defer freeCString(id)
+	ptr := (*C.double)(unsafe.Pointer(&data[0]))
+	n := C.size_t(len(data))
+	switch kind {
+	case 2:
+		C.mlpackToArmaRow(p.mem, id, ptr, n)
+	case 3:
+		C.mlpackToArmaUrow(p.mem, id, ptr, n)
+	case 4:
+		C.mlpackToArmaCol(p.mem, id, ptr, n)
+	case 5:
+		C.mlpackToArmaUcol(p.mem, id, ptr, n)
+	}
+}
+func gonumToArmaRow(p *params, id string, m *mat.Dense)  { gonumToArmaVector(p, id, m, 2) }
+func gonumToArmaUrow(p *params, id string, m *mat.Dense) { gonumToArmaVector(p, id, m, 3) }
+func gonumToArmaCol(p *params, id string, m *mat.Dense)  { gonumToArmaVector(p, id, m, 4) }
+func gonumToArmaUcol(p *params, id string, m *mat.Dense) { gonumToArmaVector(p, id, m, 5) }
 
-  // Pass pointer of the underlying matrix to mlpack.
-  ptr := unsafe.Pointer(&data[0])
-  C.mlpackToArmaUmat(p.mem, C.CString(identifier), (*C.double)(ptr),
-      C.size_t(c), C.size_t(r))
+func gonumToArmaMatWithInfo(p *params, identifier string, m *matrixWithInfo) {
+	if m == nil {
+		panic("mlpack : données et informations absentes")
+	}
+	r, c, data := compactData(m.Data)
+	if len(m.Categoricals) != c {
+		panic("mlpack : une information catégorielle est requise par dimension")
+	}
+	p.pins.Pin(&data[0])
+	id := C.CString(identifier)
+	defer freeCString(id)
+	C.mlpackToArmaMatWithInfo(p.mem, id, (*C.bool)(unsafe.Pointer(&m.Categoricals[0])),
+		(*C.double)(unsafe.Pointer(&data[0])), C.size_t(c), C.size_t(r))
 }
 
-// Passes a Gonum matrix to C by using the underlying data from the Gonum matrix.
-func gonumToArmaRow(p *params, identifier string, m *mat.Dense) {
-  // Get the number of elements in the Armadillo column.
-  e, err := m.Dims()
-  if (err != 1 && e != 1){
-    panic("Given matrix must have a single column")
-  }
-
-  // Transpose if Column vector is given
-  if e == 1 {
-    m = mat.DenseCopyOf(m.T())
-    e = err
-  }
-
-  blas64General := m.RawMatrix()
-  data := blas64General.Data
-
-  // Pass pointer of the underlying matrix to mlpack.
-  ptr := unsafe.Pointer(&data[0])
-  C.mlpackToArmaRow(p.mem, C.CString(identifier), (*C.double)(ptr),
-      C.size_t(e))
+// La sortie appartient à Go ; le tampon natif reste la propriété de Params.
+func copyArma(p *params, identifier string, kind int) (r, c int, data []float64) {
+	id := C.CString(identifier)
+	defer freeCString(id)
+	var n int
+	switch kind {
+	case 0:
+		r, c = int(C.mlpackNumColMat(p.mem, id)), int(C.mlpackNumRowMat(p.mem, id))
+		n = int(C.mlpackNumElemMat(p.mem, id))
+	case 1:
+		r, c = int(C.mlpackNumColUmat(p.mem, id)), int(C.mlpackNumRowUmat(p.mem, id))
+		n = int(C.mlpackNumElemUmat(p.mem, id))
+	case 2:
+		n = int(C.mlpackNumElemRow(p.mem, id))
+		r, c = n, 1
+	case 3:
+		n = int(C.mlpackNumElemUrow(p.mem, id))
+		r, c = n, 1
+	case 4:
+		n = int(C.mlpackNumElemCol(p.mem, id))
+		r, c = 1, n
+	case 5:
+		n = int(C.mlpackNumElemUcol(p.mem, id))
+		r, c = 1, n
+	case 6:
+		r, c = int(C.mlpackArmaMatWithInfoCols(p.mem, id)), int(C.mlpackArmaMatWithInfoRows(p.mem, id))
+		n = int(C.mlpackArmaMatWithInfoElements(p.mem, id))
+	default:
+		panic("mlpack : type de conversion inconnu")
+	}
+	if n < 0 || r < 0 || c < 0 || r*c != n {
+		panic("mlpack : dimensions natives incohérentes ou trop grandes")
+	}
+	data = make([]float64, n)
+	if n != 0 && !bool(C.mlpackCopyParamMat(p.mem, id,
+		(*C.double)(unsafe.Pointer(&data[0])), C.size_t(n), C.int(kind))) {
+		panic(fmt.Sprintf("mlpack : échec de copie de %q", identifier))
+	}
+	return r, c, data
 }
-
-// Passes a Gonum matrix to C by using the underlying data from the Gonum matrix.
-func gonumToArmaUrow(p *params, identifier string, m *mat.Dense) {
-  // Get the number of elements in the Armadillo column.
-  e, err := m.Dims()
-  if (err != 1 && e != 1){
-    panic("Given matrix must have a single column")
-  }
-
-  // Transpose if Column vector is given
-  if e == 1 {
-    m = mat.DenseCopyOf(m.T())
-    e = err
-  }
-
-  blas64General := m.RawMatrix()
-  data := blas64General.Data
-
-  // Pass pointer of the underlying matrix to mlpack.
-  ptr := unsafe.Pointer(&data[0])
-  C.mlpackToArmaUrow(p.mem, C.CString(identifier), (*C.double)(ptr),
-      C.size_t(e))
+func denseArma(p *params, id string, kind int) *mat.Dense {
+	r, c, data := copyArma(p, id, kind)
+	// Compatibilité avec les anciennes sorties optionnelles absentes.
+	if len(data) == 0 {
+		return mat.NewDense(1, 1, nil)
+	}
+	return mat.NewDense(r, c, data)
 }
-
-// Passes a Gonum matrix to C by using the underlying data from the Gonum matrix.
-func gonumToArmaCol(p *params, identifier string, m *mat.Dense) {
-  // Get the number of elements in the Armadillo column.
-  err, e := m.Dims()
-  if (err != 1 && e != 1){
-    panic("Given matrix must have a single row")
-  }
-
-  // Transpose if Row vector is given
-  if e == 1 {
-    m = mat.DenseCopyOf(m.T())
-    e = err
-  }
-
-  blas64General := m.RawMatrix()
-  data := blas64General.Data
-
-  // Pass pointer of the underlying matrix to mlpack.
-  ptr := unsafe.Pointer(&data[0])
-  C.mlpackToArmaCol(p.mem, C.CString(identifier), (*C.double)(ptr),
-      C.size_t(e))
+func (*mlpackArma) armaToGonumMat(p *params, id string) *mat.Dense  { return denseArma(p, id, 0) }
+func (*mlpackArma) armaToGonumUmat(p *params, id string) *mat.Dense { return denseArma(p, id, 1) }
+func (*mlpackArma) armaToGonumRow(p *params, id string) *mat.Dense  { return denseArma(p, id, 2) }
+func (*mlpackArma) armaToGonumUrow(p *params, id string) *mat.Dense { return denseArma(p, id, 3) }
+func (*mlpackArma) armaToGonumCol(p *params, id string) *mat.Dense  { return denseArma(p, id, 4) }
+func (*mlpackArma) armaToGonumUcol(p *params, id string) *mat.Dense { return denseArma(p, id, 5) }
+func (*mlpackArma) armaToGonumMatWithInfo(p *params, id string) *mat.Dense {
+	return denseArma(p, id, 6)
 }
-
-// Passes a Gonum matrix to C by using the underlying data from the Gonum matrix.
-func gonumToArmaUcol(p *params, identifier string, m *mat.Dense) {
-  // Get the number of elements in the Armadillo column.
-  err, e := m.Dims()
-  if (err != 1 && e != 1){
-    panic("Given matrix must have a single row")
-  }
-
-  // Transpose if Row vector is given
-  if e == 1 {
-    m = mat.DenseCopyOf(m.T())
-    e = err
-  }
-
-  blas64General := m.RawMatrix()
-  data := blas64General.Data
-
-  // Pass pointer of the underlying matrix to mlpack.
-  ptr := unsafe.Pointer(&data[0])
-  C.mlpackToArmaUcol(p.mem, C.CString(identifier), (*C.double)(ptr),
-      C.size_t(e))
-}
-
-// GonumToArmaMatWithInfo passes a gonum matrix with info to C by 
-// using it's gonums underlying blas64.
-func gonumToArmaMatWithInfo(p *params,
-                            identifier string,
-                            m *matrixWithInfo) {
-  // Get the number of elements in the Armadillo column.
-  r, c := m.Data.Dims()
-  blas64General := m.Data.RawMatrix()
-  dataAndInfo := blas64General.Data
-  boolarray := m.Categoricals
-  // Pass pointer of the underlying matrix to mlpack.
-  boolptr := unsafe.Pointer(&boolarray[0])
-  matptr := unsafe.Pointer(&dataAndInfo[0])
-  C.mlpackToArmaMatWithInfo(p.mem, C.CString(identifier),
-      (*C.bool)(boolptr), (*C.double)(matptr), C.size_t(c), C.size_t(r))
-}
-
-// ArmaToGonum returns a gonum matrix based on the memory pointer
-// of an armadillo matrix.
-func (m *mlpackArma) armaToGonumMat(p *params,
-                                    identifier string) *mat.Dense {
-  // Get the number of elements in the Armadillo row.
-  c := int(C.mlpackNumRowMat(p.mem, C.CString(identifier)))
-  r := int(C.mlpackNumColMat(p.mem, C.CString(identifier)))
-  e := int(C.mlpackNumElemMat(p.mem, C.CString(identifier)))
-
-  // Allocate Go memory pointer to the armadillo matrix.
-  m.allocArmaPtrMat(p, identifier)
-
-  // Convert pointer to slice of data, to then pass it to a gonum matrix.
-  array := (*[1<<30 - 1]float64)(m.mem)
-  if array != nil {
-    data := array[:e]
-
-    // Initialize result matrix.
-    output := mat.NewDense(r, c, data)
-
-    // Return gonum vector.
-    return output
-  }
-  return mat.NewDense(1, 1, nil)
-}
-
-// ArmaToGonum returns a gonum matrix based on the memory pointer
-// of an armadillo matrix.
-func (m *mlpackArma) armaToGonumArray(p *params,
-                                      identifier string) (int, int, []float64) {
-  // Get the number of elements in the Armadillo row.
-  c := int(C.mlpackNumRowMat(p.mem, C.CString(identifier)))
-  r := int(C.mlpackNumColMat(p.mem, C.CString(identifier)))
-  e := int(C.mlpackNumElemMat(p.mem, C.CString(identifier)))
-
-  // Allocate Go memory pointer to the armadillo matrix.
-  m.allocArmaPtrMat(p, identifier)
-
-  // Convert pointer to slice of data, to then pass it to a gonum matrix.
-  array := (*[1<<30 - 1]float64)(m.mem)
-
-  data := array[:e]
-  return r, c, data
-}
-
-// ArmaToGonum returns a gonum matrix based on the memory pointer
-// of an armadillo matrix.
-func (m *mlpackArma) armaToGonumUmat(p *params,
-                                     identifier string) *mat.Dense {
-  // Get the number of elements in the Armadillo row.
-  c := int(C.mlpackNumRowUmat(p.mem, C.CString(identifier)))
-  r := int(C.mlpackNumColUmat(p.mem, C.CString(identifier)))
-  e := int(C.mlpackNumElemUmat(p.mem, C.CString(identifier)))
-
-  // Allocate Go memory pointer to the armadillo matrix.
-  m.allocArmaPtrUmat(p, identifier)
-
-  // Convert pointer to slice of data, to then pass it to a gonum matrix.
-  array := (*[1<<30 - 1]float64)(m.mem)
-  if array != nil {
-    data := array[:e]
-
-    // Initialize result matrix.
-    output := mat.NewDense(r, c, data)
-
-    // Return gonum vector.
-    return output
-  }
-  return mat.NewDense(1, 1, nil)
-}
-
-// ArmaRowToGonum returns a gonum vector based on the memory pointer
-// of the underlying armadillo object.
-func (m *mlpackArma) armaToGonumRow(p *params,
-                                    identifier string) *mat.Dense {
-  // Get the number of elements in the Armadillo row.
-  e := int(C.mlpackNumElemRow(p.mem, C.CString(identifier)))
-
-  // Allocate Go memory pointer to the armadillo matrix.
-  m.allocArmaPtrRow(p, identifier)
-
-  // Convert pointer to slice of data, to then pass it to a gonum matrix.
-  array := (*[1<<30 - 1]float64)(m.mem)
-  if array != nil {
-    data := array[:e]
-
-    // Initialize result matrix.
-    output := mat.NewDense(e, 1, data)
-
-    // Return gonum vector.
-    return output
-  }
-  return mat.NewDense(1, 1, nil)
-}
-
-// ArmaRowToGonum returns a gonum vector based on the memory pointer
-// of the underlying armadillo object.
-func (m *mlpackArma) armaToGonumUrow(p *params,
-                                     identifier string) *mat.Dense {
-  // Get the number of elements in the Armadillo row.
-  e := int(C.mlpackNumElemUrow(p.mem, C.CString(identifier)))
-
-  // Allocate Go memory pointer to the armadillo matrix.
-  m.allocArmaPtrUrow(p, identifier)
-
-  // Convert pointer to slice of data, to then pass it to a gonum matrix.
-  array := (*[1<<30 - 1]float64)(m.mem)
-  if array != nil {
-    data := array[:e]
-
-    // Initialize result matrix.
-    output := mat.NewDense(e, 1, data)
-    // Return gonum vector.
-    return output
-  }
-  return mat.NewDense(1, 1, nil)
-}
-
-// Passes a Gonum matrix to C by using the underlying data from the Gonum
-// matrix.
-func (m *mlpackArma) armaToGonumCol(p *params,
-                                    identifier string) *mat.Dense {
-  // Get the number of elements in the Armadillo column.
-  e := int(C.mlpackNumElemCol(p.mem, C.CString(identifier)))
-
-  // Allocate Go memory pointer to the armadillo matrix.
-  m.allocArmaPtrCol(p, identifier)
-
-  // Convert pointer to slice of data, to then pass it to a gonum matrix.
-  array := (*[1<<30 - 1]float64)(m.mem)
-  if array != nil {
-    data := array[:e]
-
-    // Initialize result matrix.
-    output := mat.NewDense(1, e, data)
-
-    // Return gonum vector.
-    return output
-  }
-  return mat.NewDense(1, 1, nil)
-}
-
-// Passes a Gonum matrix to C by using the underlying data from the Gonum
-// matrix.
-func (m *mlpackArma) armaToGonumUcol(p *params,
-                                     identifier string) *mat.Dense {
-  // Get the number of elements in the Armadillo column.
-  e := int(C.mlpackNumElemUcol(p.mem, C.CString(identifier)))
-
-  // Allocate Go memory pointer to the armadillo matrix.
-  m.allocArmaPtrUcol(p, identifier)
-
-  // Convert pointer to slice of data, to then pass it to a gonum matrix.
-  array := (*[1<<30 - 1]float64)(m.mem)
-  if array != nil {
-    data := array[:e]
-
-    // Initialize result matrix.
-    output := mat.NewDense(1, e, data)
-
-    // Return gonum vector.
-    return output
-  }
-  return mat.NewDense(1, 1, nil)
-}
-
-// Passes a Gonum matrix to C by using the underlying data from the Gonum
-// matrix.
-func (m *mlpackArma) armaToGonumMatWithInfo(p *params,
-                                            identifier string) *mat.Dense {
-  // Get number of rows, columns, and elements of the Armadillo matrix.
-  c := int(C.mlpackArmaMatWithInfoRows(p.mem, C.CString(identifier)))
-  r := int(C.mlpackArmaMatWithInfoCols(p.mem, C.CString(identifier)))
-  e := int(C.mlpackArmaMatWithInfoElements(p.mem, C.CString(identifier)))
-
-  // Allocate Go memory pointer to the armadillo matrix.
-  m.allocArmaPtrMatWithInfo(p, identifier)
-  matarray := (*[1<<30 - 1]float64)(m.mem)
-
-  if matarray != nil {
-    data := matarray[:e]
-
-    // Initialize result matrix.
-    output := mat.NewDense(r, c, data)
-
-    // Return gonum vector.
-    return output
-  }
-  return mat.NewDense(1, 1, nil)
+func (*mlpackArma) armaToGonumArray(p *params, id string) (int, int, []float64) {
+	return copyArma(p, id, 0)
 }

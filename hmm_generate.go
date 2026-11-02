@@ -61,7 +61,9 @@ func HmmGenerateOptions() *HmmGenerateOptionalParam {
  */
 func HmmGenerate(length int, model *hmmModel, param *HmmGenerateOptionalParam) (*mat.Dense, *mat.Dense) {
   params := getParams("hmm_generate")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -104,9 +106,6 @@ func HmmGenerate(length int, model *hmmModel, param *HmmGenerateOptionalParam) (
   output := outputPtr.armaToGonumMat(params, "output")
   var statePtr mlpackArma
   state := statePtr.armaToGonumUmat(params, "state")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return output, state
 }

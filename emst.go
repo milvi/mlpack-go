@@ -70,7 +70,9 @@ func EmstOptions() *EmstOptionalParam {
  */
 func Emst(input *mat.Dense, param *EmstOptionalParam) (*mat.Dense) {
   params := getParams("emst")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -106,9 +108,6 @@ func Emst(input *mat.Dense, param *EmstOptionalParam) (*mat.Dense) {
   // Initialize result variable and get output.
   var outputPtr mlpackArma
   output := outputPtr.armaToGonumMat(params, "output")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return output
 }

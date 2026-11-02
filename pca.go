@@ -79,7 +79,9 @@ func PcaOptions() *PcaOptionalParam {
  */
 func Pca(input *mat.Dense, param *PcaOptionalParam) (*mat.Dense) {
   params := getParams("pca")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -127,9 +129,6 @@ func Pca(input *mat.Dense, param *PcaOptionalParam) (*mat.Dense) {
   // Initialize result variable and get output.
   var outputPtr mlpackArma
   output := outputPtr.armaToGonumMat(params, "output")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return output
 }

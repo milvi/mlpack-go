@@ -128,7 +128,9 @@ func SparseCodingOptions() *SparseCodingOptionalParam {
  */
 func SparseCoding(param *SparseCodingOptionalParam) (*mat.Dense, *mat.Dense, sparseCoding) {
   params := getParams("sparse_coding")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -226,9 +228,6 @@ func SparseCoding(param *SparseCodingOptionalParam) (*mat.Dense, *mat.Dense, spa
   dictionary := dictionaryPtr.armaToGonumMat(params, "dictionary")
   var outputModel sparseCoding
   outputModel.getSparseCoding(params, "output_model")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return codes, dictionary, outputModel
 }

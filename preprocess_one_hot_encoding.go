@@ -59,7 +59,9 @@ func PreprocessOneHotEncodingOptions() *PreprocessOneHotEncodingOptionalParam {
  */
 func PreprocessOneHotEncoding(input *matrixWithInfo, param *PreprocessOneHotEncodingOptionalParam) (*mat.Dense) {
   params := getParams("preprocess_one_hot_encoding")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -89,9 +91,6 @@ func PreprocessOneHotEncoding(input *matrixWithInfo, param *PreprocessOneHotEnco
   // Initialize result variable and get output.
   var outputPtr mlpackArma
   output := outputPtr.armaToGonumMat(params, "output")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return output
 }

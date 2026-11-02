@@ -175,7 +175,9 @@ func KdeOptions() *KdeOptionalParam {
  */
 func Kde(param *KdeOptionalParam) (kdeModel, *mat.Dense) {
   params := getParams("kde")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -282,9 +284,6 @@ func Kde(param *KdeOptionalParam) (kdeModel, *mat.Dense) {
   outputModel.getKDEModel(params, "output_model")
   var predictionsPtr mlpackArma
   predictions := predictionsPtr.armaToGonumCol(params, "predictions")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return outputModel, predictions
 }

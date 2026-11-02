@@ -49,7 +49,9 @@ func HmmViterbiOptions() *HmmViterbiOptionalParam {
  */
 func HmmViterbi(input *mat.Dense, inputModel *hmmModel, param *HmmViterbiOptionalParam) (*mat.Dense) {
   params := getParams("hmm_viterbi")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -77,9 +79,6 @@ func HmmViterbi(input *mat.Dense, inputModel *hmmModel, param *HmmViterbiOptiona
   // Initialize result variable and get output.
   var outputPtr mlpackArma
   output := outputPtr.armaToGonumUmat(params, "output")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return output
 }

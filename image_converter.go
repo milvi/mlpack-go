@@ -85,7 +85,9 @@ func ImageConverterOptions() *ImageConverterOptionalParam {
  */
 func ImageConverter(input []string, param *ImageConverterOptionalParam) (*mat.Dense) {
   params := getParams("image_converter")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -145,9 +147,6 @@ func ImageConverter(input []string, param *ImageConverterOptionalParam) (*mat.De
   // Initialize result variable and get output.
   var outputPtr mlpackArma
   output := outputPtr.armaToGonumMat(params, "output")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return output
 }

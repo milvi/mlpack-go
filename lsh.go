@@ -109,7 +109,9 @@ func LshOptions() *LshOptionalParam {
  */
 func Lsh(param *LshOptionalParam) (*mat.Dense, *mat.Dense, lshSearch) {
   params := getParams("lsh")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -207,9 +209,6 @@ func Lsh(param *LshOptionalParam) (*mat.Dense, *mat.Dense, lshSearch) {
   neighbors := neighborsPtr.armaToGonumUmat(params, "neighbors")
   var outputModel lshSearch
   outputModel.getLSHSearch(params, "output_model")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return distances, neighbors, outputModel
 }

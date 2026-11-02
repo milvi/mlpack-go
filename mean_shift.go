@@ -80,7 +80,9 @@ func MeanShiftOptions() *MeanShiftOptionalParam {
  */
 func MeanShift(input *mat.Dense, param *MeanShiftOptionalParam) (*mat.Dense, *mat.Dense) {
   params := getParams("mean_shift")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -137,9 +139,6 @@ func MeanShift(input *mat.Dense, param *MeanShiftOptionalParam) (*mat.Dense, *ma
   centroid := centroidPtr.armaToGonumMat(params, "centroid")
   var outputPtr mlpackArma
   output := outputPtr.armaToGonumMat(params, "output")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return centroid, output
 }

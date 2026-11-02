@@ -191,7 +191,9 @@ func LmnnOptions() *LmnnOptionalParam {
  */
 func Lmnn(input *mat.Dense, param *LmnnOptionalParam) (*mat.Dense, *mat.Dense, *mat.Dense) {
   params := getParams("lmnn")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -323,9 +325,6 @@ func Lmnn(input *mat.Dense, param *LmnnOptionalParam) (*mat.Dense, *mat.Dense, *
   output := outputPtr.armaToGonumMat(params, "output")
   var transformedDataPtr mlpackArma
   transformedData := transformedDataPtr.armaToGonumMat(params, "transformed_data")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return centeredData, output, transformedData
 }

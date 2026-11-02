@@ -52,7 +52,9 @@ func GmmGenerateOptions() *GmmGenerateOptionalParam {
  */
 func GmmGenerate(inputModel *gmm, samples int, param *GmmGenerateOptionalParam) (*mat.Dense) {
   params := getParams("gmm_generate")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -86,9 +88,6 @@ func GmmGenerate(inputModel *gmm, samples int, param *GmmGenerateOptionalParam) 
   // Initialize result variable and get output.
   var outputPtr mlpackArma
   output := outputPtr.armaToGonumMat(params, "output")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return output
 }

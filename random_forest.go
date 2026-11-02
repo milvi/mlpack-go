@@ -143,7 +143,9 @@ func RandomForestOptions() *RandomForestOptionalParam {
  */
 func RandomForest(param *RandomForestOptionalParam) (randomForestModel, *mat.Dense, *mat.Dense) {
   params := getParams("random_forest")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -247,9 +249,6 @@ func RandomForest(param *RandomForestOptionalParam) (randomForestModel, *mat.Den
   predictions := predictionsPtr.armaToGonumUrow(params, "predictions")
   var probabilitiesPtr mlpackArma
   probabilities := probabilitiesPtr.armaToGonumMat(params, "probabilities")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return outputModel, predictions, probabilities
 }

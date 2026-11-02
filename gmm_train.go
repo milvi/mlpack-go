@@ -140,7 +140,9 @@ func GmmTrainOptions() *GmmTrainOptionalParam {
  */
 func GmmTrain(gaussians int, input *mat.Dense, param *GmmTrainOptionalParam) (gmm) {
   params := getParams("gmm_train")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -240,9 +242,6 @@ func GmmTrain(gaussians int, input *mat.Dense, param *GmmTrainOptionalParam) (gm
   // Initialize result variable and get output.
   var outputModel gmm
   outputModel.getGMM(params, "output_model")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return outputModel
 }

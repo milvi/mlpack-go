@@ -1,0 +1,146 @@
+Extrait : lignes de copie CMake retirées ; SHA-256 du journal intégral dans laboratoire.json.
+Installation : /workspace/scratch/4e86f9511672/audit/validation-home/.local/opt/mlpack-go-milvi/4.8.0-go1.27.3
+Construction : /workspace/scratch/4e86f9511672/audit/labhome/.cache/mlpack-go/4.8.0-go1.27.3
+Compilations simultanées : 2
+15.2.1
+Archive vérifiée en cache : /workspace/scratch/4e86f9511672/audit/labhome/.cache/mlpack-go/4.8.0-go1.27.3/go1.27.3.linux-amd64.tar.gz
+Archive vérifiée en cache : /workspace/scratch/4e86f9511672/audit/labhome/.cache/mlpack-go/4.8.0-go1.27.3/mlpack-4.8.0.tar.gz
+patching file CMake/go/AppendModel.cmake
+patching file src/mlpack/bindings/go/CMakeLists.txt
+patching file src/mlpack/bindings/go/mlpack/arma_util.go
+patching file src/mlpack/bindings/go/mlpack/capi/arma_util.cpp
+patching file src/mlpack/bindings/go/mlpack/capi/arma_util.h
+patching file src/mlpack/bindings/go/mlpack/capi/io_util.cpp
+patching file src/mlpack/bindings/go/mlpack/capi/io_util.h
+patching file src/mlpack/bindings/go/mlpack/go.mod
+patching file src/mlpack/bindings/go/mlpack/io_util.go
+patching file src/mlpack/bindings/go/print_go.cpp
+-- Not building Julia bindings.
+-- Not building Markdown bindings.
+-- Not building Python bindings.
+-- Not building Go bindings.
+-- Not building R bindings.
+-- Configuring done (0.0s)
+-- Generating done (0.2s)
+-- Build files have been written to: /workspace/scratch/4e86f9511672/audit/labhome/.cache/mlpack-go/4.8.0-go1.27.3/build
+[  1%] Generating mlpack.pc (pkg-config) file.
+[  3%] Built target mlpack_go_util
+[  3%] Built target pkgconfig
+[  3%] Built target go_copy
+[  3%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_linear_regression.so
+[  4%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_approx_kfn.so
+[  6%] Built target mlpack_go_linear_regression
+[  7%] Built target mlpack_go_approx_kfn
+[  8%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_cf.so
+[  9%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_dbscan.so
+[ 10%] Built target mlpack_go_dbscan
+[ 10%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_det.so
+[ 11%] Built target mlpack_go_cf
+[ 11%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_emst.so
+[ 13%] Built target mlpack_go_det
+[ 15%] Built target mlpack_go_emst
+[ 16%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_fastmks.so
+[ 17%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_gmm_train.so
+[ 19%] Built target mlpack_go_fastmks
+[ 20%] Built target mlpack_go_gmm_train
+[ 21%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_gmm_generate.so
+[ 22%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_gmm_probability.so
+[ 23%] Built target mlpack_go_gmm_probability
+[ 24%] Built target mlpack_go_gmm_generate
+[ 25%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_hmm_train.so
+[ 26%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_hmm_generate.so
+[ 27%] Built target mlpack_go_hmm_train
+[ 28%] Built target mlpack_go_hmm_generate
+[ 29%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_hmm_loglik.so
+[ 29%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_hmm_viterbi.so
+[ 32%] Built target mlpack_go_hmm_viterbi
+[ 32%] Built target mlpack_go_hmm_loglik
+[ 33%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_image_converter.so
+[ 33%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_hoeffding_tree.so
+[ 35%] Built target mlpack_go_image_converter
+[ 37%] Built target mlpack_go_hoeffding_tree
+[ 38%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_kernel_pca.so
+[ 39%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_kde.so
+[ 40%] Built target mlpack_go_kernel_pca
+[ 41%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_kmeans.so
+[ 42%] Built target mlpack_go_kde
+[ 43%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_bayesian_linear_regression.so
+[ 44%] Built target mlpack_go_kmeans
+[ 45%] Built target mlpack_go_bayesian_linear_regression
+[ 45%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_lars.so
+[ 46%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_linear_svm.so
+[ 48%] Built target mlpack_go_lars
+[ 50%] Built target mlpack_go_linear_svm
+[ 51%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_lmnn.so
+[ 52%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_local_coordinate_coding.so
+[ 53%] Built target mlpack_go_lmnn
+[ 54%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_logistic_regression.so
+[ 55%] Built target mlpack_go_local_coordinate_coding
+[ 56%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_lsh.so
+[ 57%] Built target mlpack_go_logistic_regression
+[ 58%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_mean_shift.so
+[ 59%] Built target mlpack_go_lsh
+[ 59%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_nbc.so
+[ 60%] Built target mlpack_go_mean_shift
+[ 60%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_nca.so
+[ 62%] Built target mlpack_go_nbc
+[ 63%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_knn.so
+[ 65%] Built target mlpack_go_nca
+[ 66%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_kfn.so
+[ 67%] Built target mlpack_go_knn
+[ 67%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_nmf.so
+[ 68%] Built target mlpack_go_kfn
+[ 69%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_pca.so
+[ 71%] Built target mlpack_go_nmf
+[ 72%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_perceptron.so
+[ 74%] Built target mlpack_go_pca
+[ 74%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_preprocess_split.so
+[ 75%] Built target mlpack_go_perceptron
+[ 76%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_preprocess_binarize.so
+[ 78%] Built target mlpack_go_preprocess_split
+[ 79%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_preprocess_describe.so
+[ 80%] Built target mlpack_go_preprocess_binarize
+[ 81%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_preprocess_scale.so
+[ 82%] Built target mlpack_go_preprocess_describe
+[ 83%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_preprocess_one_hot_encoding.so
+[ 84%] Built target mlpack_go_preprocess_scale
+[ 84%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_radical.so
+[ 85%] Built target mlpack_go_preprocess_one_hot_encoding
+[ 85%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_krann.so
+[ 87%] Built target mlpack_go_radical
+[ 88%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_softmax_regression.so
+[ 90%] Built target mlpack_go_krann
+[ 91%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_sparse_coding.so
+[ 93%] Built target mlpack_go_softmax_regression
+[ 93%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_random_forest.so
+[ 94%] Built target mlpack_go_sparse_coding
+[ 95%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_decision_tree.so
+[ 97%] Built target mlpack_go_random_forest
+[ 98%] Linking CXX shared library ../bindings/go/src/mlpack.org/v1/mlpack/libmlpack_go_adaboost.so
+[ 99%] Built target mlpack_go_decision_tree
+[100%] Built target mlpack_go_adaboost
+[100%] Built target go_shlib
+-- Install configuration: "Release"
+all modules verified
+[0;32m[INFO ] [0mUsing initial centroid guesses.
+[0;32m[INFO ] [0mKMeans::Cluster(): iteration 1, residual 0.816497.
+[0;32m[INFO ] [0mKMeans::Cluster(): iteration 2, residual 0.
+[0;32m[INFO ] [0mKMeans::Cluster(): converged after 2 iterations.
+[0;32m[INFO ] [0m60 distance calculations.
+naive : OK — 9 points, 3 dimensions, 3 classes non vides
+étiquettes : [0 0 0 1 1 1 2 2 2] ; effectifs : [3 3 3]
+[0;32m[INFO ] [0mUsing initial centroid guesses.
+[0;32m[INFO ] [0mKMeans::Cluster(): iteration 1, residual 0.816497.
+[0;32m[INFO ] [0m19 node combinations were scored.
+[0;32m[INFO ] [0m3 base cases were calculated.
+[0;32m[INFO ] [0mKMeans::Cluster(): iteration 2, residual 0.
+[0;32m[INFO ] [0mKMeans::Cluster(): converged after 2 iterations.
+[0;32m[INFO ] [0m63 distance calculations.
+dualtree : OK — 9 points, 3 dimensions, 3 classes non vides
+étiquettes : [0 0 0 1 1 1 2 2 2] ; effectifs : [3 3 3]
+
+Installation et vérification k-means réussies.
+Pour la session courante :
+  source /workspace/scratch/4e86f9511672/audit/validation-home/.local/opt/mlpack-go-milvi/4.8.0-go1.27.3/env.sh
+Pour relancer la vérification :
+  /workspace/scratch/4e86f9511672/audit/validation-home/.local/opt/mlpack-go-milvi/4.8.0-go1.27.3/bin/kmeans-demo

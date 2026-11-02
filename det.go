@@ -99,7 +99,9 @@ func DetOptions() *DetOptionalParam {
  */
 func Det(param *DetOptionalParam) (dTree, string, string, *mat.Dense, *mat.Dense, *mat.Dense) {
   params := getParams("det")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -180,9 +182,6 @@ func Det(param *DetOptionalParam) (dTree, string, string, *mat.Dense, *mat.Dense
   trainingSetEstimates := trainingSetEstimatesPtr.armaToGonumMat(params, "training_set_estimates")
   var viPtr mlpackArma
   vi := viPtr.armaToGonumMat(params, "vi")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return outputModel, tagCountersFile, tagFile, testSetEstimates, trainingSetEstimates, vi
 }

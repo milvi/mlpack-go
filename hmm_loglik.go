@@ -49,7 +49,9 @@ func HmmLoglikOptions() *HmmLoglikOptionalParam {
  */
 func HmmLoglik(input *mat.Dense, inputModel *hmmModel, param *HmmLoglikOptionalParam) (float64) {
   params := getParams("hmm_loglik")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -76,9 +78,6 @@ func HmmLoglik(input *mat.Dense, inputModel *hmmModel, param *HmmLoglikOptionalP
 
   // Initialize result variable and get output.
   logLikelihood := getParamDouble(params, "log_likelihood")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return logLikelihood
 }

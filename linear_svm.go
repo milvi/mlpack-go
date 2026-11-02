@@ -160,7 +160,9 @@ func LinearSvmOptions() *LinearSvmOptionalParam {
  */
 func LinearSvm(param *LinearSvmOptionalParam) (linearsvmModel, *mat.Dense, *mat.Dense) {
   params := getParams("linear_svm")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -282,9 +284,6 @@ func LinearSvm(param *LinearSvmOptionalParam) (linearsvmModel, *mat.Dense, *mat.
   predictions := predictionsPtr.armaToGonumUrow(params, "predictions")
   var probabilitiesPtr mlpackArma
   probabilities := probabilitiesPtr.armaToGonumMat(params, "probabilities")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return outputModel, predictions, probabilities
 }

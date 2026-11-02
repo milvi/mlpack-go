@@ -21,6 +21,11 @@
 extern "C" {
 #endif
 
+// Copie les entiers dans un tampon de l'appelant ; aucune allocation transférée.
+bool mlpackCopyParamVectorInt(void* params, const char* identifier,
+                             long long* destination, const size_t length);
+
+
 /**
  * Get a new Params object for the given binding name.
  */

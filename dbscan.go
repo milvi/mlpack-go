@@ -90,7 +90,9 @@ func DbscanOptions() *DbscanOptionalParam {
  */
 func Dbscan(input *mat.Dense, param *DbscanOptionalParam) (*mat.Dense, *mat.Dense) {
   params := getParams("dbscan")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -153,9 +155,6 @@ func Dbscan(input *mat.Dense, param *DbscanOptionalParam) (*mat.Dense, *mat.Dens
   assignments := assignmentsPtr.armaToGonumUrow(params, "assignments")
   var centroidsPtr mlpackArma
   centroids := centroidsPtr.armaToGonumMat(params, "centroids")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return assignments, centroids
 }

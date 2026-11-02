@@ -114,7 +114,9 @@ func KnnOptions() *KnnOptionalParam {
  */
 func Knn(param *KnnOptionalParam) (*mat.Dense, *mat.Dense, knnModel) {
   params := getParams("knn")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -224,9 +226,6 @@ func Knn(param *KnnOptionalParam) (*mat.Dense, *mat.Dense, knnModel) {
   neighbors := neighborsPtr.armaToGonumUmat(params, "neighbors")
   var outputModel knnModel
   outputModel.getKNNModel(params, "output_model")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return distances, neighbors, outputModel
 }

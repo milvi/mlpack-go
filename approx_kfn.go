@@ -140,7 +140,9 @@ func ApproxKfnOptions() *ApproxKfnOptionalParam {
  */
 func ApproxKfn(param *ApproxKfnOptionalParam) (*mat.Dense, *mat.Dense, approxkfnModel) {
   params := getParams("approx_kfn")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -220,9 +222,6 @@ func ApproxKfn(param *ApproxKfnOptionalParam) (*mat.Dense, *mat.Dense, approxkfn
   neighbors := neighborsPtr.armaToGonumUmat(params, "neighbors")
   var outputModel approxkfnModel
   outputModel.getApproxKFNModel(params, "output_model")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return distances, neighbors, outputModel
 }

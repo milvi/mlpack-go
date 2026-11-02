@@ -120,7 +120,9 @@ func BayesianLinearRegressionOptions() *BayesianLinearRegressionOptionalParam {
  */
 func BayesianLinearRegression(param *BayesianLinearRegressionOptionalParam) (bayesianLinearRegression, *mat.Dense, *mat.Dense) {
   params := getParams("bayesian_linear_regression")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -182,9 +184,6 @@ func BayesianLinearRegression(param *BayesianLinearRegressionOptionalParam) (bay
   predictions := predictionsPtr.armaToGonumMat(params, "predictions")
   var stdsPtr mlpackArma
   stds := stdsPtr.armaToGonumMat(params, "stds")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return outputModel, predictions, stds
 }

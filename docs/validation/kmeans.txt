@@ -1,0 +1,16 @@
+[0;32m[INFO ] [0mUsing initial centroid guesses.
+[0;32m[INFO ] [0mKMeans::Cluster(): iteration 1, residual 0.816497.
+[0;32m[INFO ] [0mKMeans::Cluster(): iteration 2, residual 0.
+[0;32m[INFO ] [0mKMeans::Cluster(): converged after 2 iterations.
+[0;32m[INFO ] [0m60 distance calculations.
+naive : OK — 9 points, 3 dimensions, 3 classes non vides
+étiquettes : [0 0 0 1 1 1 2 2 2] ; effectifs : [3 3 3]
+[0;32m[INFO ] [0mUsing initial centroid guesses.
+[0;32m[INFO ] [0mKMeans::Cluster(): iteration 1, residual 0.816497.
+[0;32m[INFO ] [0m19 node combinations were scored.
+[0;32m[INFO ] [0m3 base cases were calculated.
+[0;32m[INFO ] [0mKMeans::Cluster(): iteration 2, residual 0.
+[0;32m[INFO ] [0mKMeans::Cluster(): converged after 2 iterations.
+[0;32m[INFO ] [0m63 distance calculations.
+dualtree : OK — 9 points, 3 dimensions, 3 classes non vides
+étiquettes : [0 0 0 1 1 1 2 2 2] ; effectifs : [3 3 3]

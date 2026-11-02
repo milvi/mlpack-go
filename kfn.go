@@ -111,7 +111,9 @@ func KfnOptions() *KfnOptionalParam {
  */
 func Kfn(param *KfnOptionalParam) (*mat.Dense, *mat.Dense, kfnModel) {
   params := getParams("kfn")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -215,9 +217,6 @@ func Kfn(param *KfnOptionalParam) (*mat.Dense, *mat.Dense, kfnModel) {
   neighbors := neighborsPtr.armaToGonumUmat(params, "neighbors")
   var outputModel kfnModel
   outputModel.getKFNModel(params, "output_model")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return distances, neighbors, outputModel
 }

@@ -49,7 +49,9 @@ func GmmProbabilityOptions() *GmmProbabilityOptionalParam {
  */
 func GmmProbability(input *mat.Dense, inputModel *gmm, param *GmmProbabilityOptionalParam) (*mat.Dense) {
   params := getParams("gmm_probability")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -77,9 +79,6 @@ func GmmProbability(input *mat.Dense, inputModel *gmm, param *GmmProbabilityOpti
   // Initialize result variable and get output.
   var outputPtr mlpackArma
   output := outputPtr.armaToGonumMat(params, "output")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return output
 }

@@ -108,7 +108,9 @@ func FastmksOptions() *FastmksOptionalParam {
  */
 func Fastmks(param *FastmksOptionalParam) (*mat.Dense, *mat.Dense, fastmksModel) {
   params := getParams("fastmks")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -206,9 +208,6 @@ func Fastmks(param *FastmksOptionalParam) (*mat.Dense, *mat.Dense, fastmksModel)
   kernels := kernelsPtr.armaToGonumMat(params, "kernels")
   var outputModel fastmksModel
   outputModel.getFastMKSModel(params, "output_model")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return indices, kernels, outputModel
 }

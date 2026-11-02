@@ -87,7 +87,9 @@ func PreprocessDescribeOptions() *PreprocessDescribeOptionalParam {
  */
 func PreprocessDescribe(input *mat.Dense, param *PreprocessDescribeOptionalParam) () {
   params := getParams("preprocess_describe")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -138,9 +140,6 @@ func PreprocessDescribe(input *mat.Dense, param *PreprocessDescribeOptionalParam
   C.mlpackPreprocessDescribe(params.mem, timers.mem)
 
   // Initialize result variable and get output.
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return 
 }

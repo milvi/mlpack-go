@@ -1,0 +1,40 @@
+Extrait : lignes de copie CMake retirées ; SHA-256 du journal intégral dans laboratoire.json.
+-- The C compiler identification is GNU 15.2.0
+-- The CXX compiler identification is GNU 15.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /workspace/scratch/4e86f9511672/audit/lab-cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /workspace/scratch/4e86f9511672/audit/lab-cxx - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test HAVE_CXX_ATOMICS64_WITHOUT_LIB
+-- Performing Test HAVE_CXX_ATOMICS64_WITHOUT_LIB - Success
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Found OpenMP_C: -fopenmp (found version "4.5")
+-- Found OpenMP_CXX: -fopenmp (found version "4.5")
+-- Found OpenMP: TRUE (found version "4.5")
+-- Found armadillo: /usr/include (found version "15.2.1")
+-- Found ensmallen: /usr/include (found version "3.11.0")
+-- Found cereal: /usr/include (found version "1.3.2")
+-- Found mlpack: /workspace/scratch/4e86f9511672/audit/verification-patch/mlpack-4.8.0/src (found version "4.8.0")
+-- Not building Julia bindings.
+-- Not building Markdown bindings.
+-- Not building Python bindings.
+-- Found Go: /workspace/scratch/4e86f9511672/audit/lab-go (found suitable version "1.27.3", minimum required is "1.21.0")
+-- Not building R bindings.
+-- Found PkgConfig: /usr/bin/pkg-config (found version "2.5.1")
+-- Configuring done (0.9s)
+-- Generating done (0.2s)
+-- Build files have been written to: /workspace/scratch/4e86f9511672/audit/generation-test
+[  0%] Generating ../bindings/go/src/mlpack.org/v1/mlpack/capi/kmeans.h
+[  0%] Generating ../bindings/go/generate_go_kmeans.cpp
+[100%] Building CXX object src/mlpack/methods/CMakeFiles/generate_go_kmeans.dir/__/bindings/go/print_go.cpp.o
+[100%] Building CXX object src/mlpack/methods/CMakeFiles/generate_go_kmeans.dir/__/bindings/go/generate_go_kmeans.cpp.o
+[100%] Linking CXX executable ../../../bin/generate_go_kmeans
+[100%] Built target generate_go_kmeans

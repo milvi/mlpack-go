@@ -1,19 +1,32 @@
-# How to deploy a new mlpack version to mlpack-go.
+# Régénérer la distribution Go corrigée
 
-This process isn't automatic, and the steps below can be refined as time goes on
-into an automated script:
+La source des wrappers est le dépôt [milvi/mlpack](https://github.com/milvi/mlpack),
+avec les corrections Go de ce fork. Le dépôt présent ajoute le module sous
+`github.com/milvi/mlpack-go`, l'installateur, ses tests et sa documentation.
 
- 1. Check out mlpack code.
- 2. Configure and build the `go` target: `make go`
- 3. First, remove the previously auto-generated go-bindings from the root of mlpack-go repository.
-```sh
- rm -r -v !(Makefile|Dockerfile|README.md|LICENSE.txt|rel)
-```
- 4. Then, copy the complete folder of the Go bindings (`build/src/mlpack/bindings/go/src/mlpack.org/v1/mlpack`)
-    to the root of mlpack-go repository.
- 5. Remove all the `.so` files.
-```sh
-rm -f *.so *.so.*
-```
- 6. Manually change the `MLPACK_VERSION` in `Makefile`.
- 7. Commit any changed files and any added files in the root and `capi/` folder of mlpack-go repository.
+Ne pas exécuter l'ancienne procédure qui effaçait tout le dépôt : elle supprimerait
+ces ajouts. Ne pas régénérer depuis une source C++ non corrigée, qui réintroduirait
+les défauts de propriété mémoire.
+
+1. Configurer la source C++ corrigée avec `BUILD_GO_BINDINGS=ON`,
+   `FORCE_BUILD_GO_BINDINGS=ON`, `BUILD_GO_SHLIB=ON`, une version de Go ≥ 1.21
+   et les dépendances natives appropriées. Pour cette distribution, utiliser
+   Go 1.27.3 et mlpack 4.8.0.
+2. Construire la cible `go` de CMake. Elle génère les fichiers Go et les
+   bibliothèques natives dans
+   `build/src/mlpack/bindings/go/src/mlpack.org/v1/mlpack/`.
+3. Copier uniquement les fichiers de wrappers `.go` et les déclarations
+   `capi/*.h` utiles. Conserver les tests, exemples, documentation, installateur,
+   workflow, Dockerfile, Makefile et le module du présent fork.
+4. Vérifier que `arma_util.go`, `io_util.go` et les déclarations C correspondent
+   à la source corrigée. Le module généré dans le dépôt C++ conserve le chemin
+   amont ; le module distribué ici doit rester `github.com/milvi/mlpack-go`.
+5. Si le correctif natif change, reconstruire le patch depuis la base 4.8.0,
+   vérifier son application à une archive neuve et mettre à jour le SHA-256
+   attendu dans `installer.sh`.
+6. Exécuter les tests décrits dans le README, puis construire le Dockerfile
+   depuis une base propre. Ne jamais committer les `.so`, archives ou caches.
+
+La distribution de wrappers et l'installation native sont donc deux étapes.
+L'installation normale n'active pas le générateur : les wrappers présents ici
+sont déjà générés, tandis que les 47 bibliothèques natives sont reconstruites.

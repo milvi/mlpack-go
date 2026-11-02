@@ -108,7 +108,9 @@ func PreprocessSplitOptions() *PreprocessSplitOptionalParam {
  */
 func PreprocessSplit(input *mat.Dense, param *PreprocessSplitOptionalParam) (*mat.Dense, *mat.Dense, *mat.Dense, *mat.Dense) {
   params := getParams("preprocess_split")
+  defer cleanParams(params)
   timers := getTimers()
+  defer cleanTimers(timers)
 
   disableBacktrace()
   disableVerbose()
@@ -171,9 +173,6 @@ func PreprocessSplit(input *mat.Dense, param *PreprocessSplitOptionalParam) (*ma
   training := trainingPtr.armaToGonumMat(params, "training")
   var trainingLabelsPtr mlpackArma
   trainingLabels := trainingLabelsPtr.armaToGonumUmat(params, "training_labels")
-  // Clean memory.
-  cleanParams(params)
-  cleanTimers(timers)
   // Return output(s).
   return test, testLabels, training, trainingLabels
 }
