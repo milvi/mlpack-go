@@ -21,6 +21,7 @@ les défauts de propriété mémoire.
 4. Vérifier que `arma_util.go`, `io_util.go` et les déclarations C correspondent
    à la source corrigée. Le module généré dans le dépôt C++ conserve le chemin
    amont ; le module distribué ici doit rester `github.com/milvi/mlpack-go`.
+   Adapter aussi le commentaire d'import canonique de `doc.go` à ce chemin.
 5. Si le correctif natif change, reconstruire le patch depuis la base 4.8.0,
    vérifier son application à une archive neuve et mettre à jour le SHA-256
    attendu dans `installer.sh`.

@@ -1,0 +1,23 @@
+go: creating new go.mod: module exemple.local/validation
+go: to add module requirements and sums:
+	go mod tidy
+go: downloading github.com/milvi/mlpack-go v0.0.0-20261102004546-a4cedd823d9c
+go: added github.com/milvi/mlpack-go v0.0.0-20261102004546-a4cedd823d9c
+go: added gonum.org/v1/gonum v0.7.0
+all modules verified
+[0;32m[INFO ] [0mUsing initial centroid guesses.
+[0;32m[INFO ] [0mKMeans::Cluster(): iteration 1, residual 0.816497.
+[0;32m[INFO ] [0mKMeans::Cluster(): iteration 2, residual 0.
+[0;32m[INFO ] [0mKMeans::Cluster(): converged after 2 iterations.
+[0;32m[INFO ] [0m60 distance calculations.
+naive : OK — 9 points, 3 dimensions, 3 classes non vides
+étiquettes : [0 0 0 1 1 1 2 2 2] ; effectifs : [3 3 3]
+[0;32m[INFO ] [0mUsing initial centroid guesses.
+[0;32m[INFO ] [0mKMeans::Cluster(): iteration 1, residual 0.816497.
+[0;32m[INFO ] [0m19 node combinations were scored.
+[0;32m[INFO ] [0m3 base cases were calculated.
+[0;32m[INFO ] [0mKMeans::Cluster(): iteration 2, residual 0.
+[0;32m[INFO ] [0mKMeans::Cluster(): converged after 2 iterations.
+[0;32m[INFO ] [0m63 distance calculations.
+dualtree : OK — 9 points, 3 dimensions, 3 classes non vides
+étiquettes : [0 0 0 1 1 1 2 2 2] ; effectifs : [3 3 3]

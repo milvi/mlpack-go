@@ -113,20 +113,27 @@ des résultats supposés de GitHub Actions.
 | Script complet du fork | Installation dans un nouveau préfixe, construction Go et validation numérique réussies |
 | Reprise du script | Réussie ; correctif reconnu, zéro objet C++ recompilé |
 | `go run -buildvcs=false ./examples/kmeans` avec l'installation du fork | Réussi pour les deux algorithmes |
+| Projet externe : `go get`, `go mod verify`, `go mod tidy`, exemple | Réussis, sans remplacement local du module |
 
 Le préfixe de validation contient 1 196 fichiers inscrits au manifeste CMake,
 en plus du SDK et des fichiers produits par le script. L'ensemble mesure environ
 296 Mo de fichiers, dont 37,5 Mo pour les bibliothèques natives. Ces chiffres
 excluent les paquets APT, les sources et objets en cache, et les caches Go.
 
+Le projet externe a téléchargé
+`github.com/milvi/mlpack-go@v0.0.0-20261102004546-a4cedd823d9c`, correspondant au
+commit publié `a4cedd823d9c44d970a1330fe6ef8a2d4e27149c`. Son exemple utilise les
+bibliothèques natives du préfixe installé par le script corrigé. Le journal et
+son `go.mod` sont conservés avec les autres preuves.
+
 Pour le diagnostic natif : glibc `mallinfo2`, somme des octets alloués dans les
 arènes et par mappage, après chauffe, `runtime.GC()` et `malloc_trim(0)`.
 Ce n'est ni le tas Go ni simplement la mémoire résidente du processus.
 
-| Mesure | Avant correctif | Après correctif |
-|---|---:|---:|
-| 50 appels k-means × 100 000 points, dimension 3, trois centres ; sorties abandonnées | +40 081 888 octets | +2 464 octets |
-| 50 000 cycles création / paramètres chaînes / destruction | Non mesuré sur l'ancien code | +25 568 octets |
+| Mesure | Avant, laboratoire | Après, laboratoire | Après, Docker |
+|---|---:|---:|---:|
+| 50 appels k-means × 100 000 points, dimension 3, trois centres ; sorties abandonnées | +40 081 888 octets | +2 464 octets | +3 920 octets |
+| 50 000 cycles création / paramètres chaînes / destruction | Non mesuré | +25 568 octets | +26 848 octets |
 
 Le seuil de régression est fixé à 2 Mio pour tolérer les allocations internes
 stabilisées de l'allocateur et des bibliothèques. Les deux variations corrigées
@@ -155,10 +162,28 @@ contre le module de ce fork. Les contrôles d'archives, l'extraction du SDK et
 l'application du patch à des sources propres ont été exercés. Cette reprise
 ne vaut pas construction native intégralement neuve sous UID ordinaire.
 
-Le Dockerfile effectue cette dernière construction dans Ubuntu 26.04, sans cache
-de construction local préchargé, après installation APT et sous un utilisateur
-ordinaire. Son workflow doit être consulté séparément pour connaître le résultat
-de l'exécution GitHub Actions du commit choisi.
+### Construction neuve en conteneur : réussie
+
+Le [workflow GitHub Actions du 2 novembre 2026](https://github.com/milvi/mlpack-go/actions/runs/41368925523)
+est **réussi**, sur le commit `a4cedd823d9c44d970a1330fe6ef8a2d4e27149c`.
+Le Dockerfile y a réellement été exécuté dans Ubuntu 26.04, sans objets C++
+préchargés. APT s'exécute d'abord comme administrateur ; le script et les tests
+s'exécutent ensuite sous l'utilisateur ordinaire `mlpack`.
+
+Le journal atteste 48 unités de compilation C++ (deux pour l'utilitaire commun,
+46 pour les méthodes), les 47 bibliothèques construites, puis :
+
+- installation et validation numérique de k-means par l'installateur ;
+- suite `go test ./...` réussie ;
+- suite avec `GOEXPERIMENT=cgocheck2` réussie ;
+- tests des allocations natives réussis, avec les mesures Docker du tableau ;
+- `docker run` de l'image produite, avec k-means `naive` et `dualtree` réussis.
+
+Des [extraits du journal](validation/ci-ubuntu2604.log) sont conservés dans le
+dépôt. Cette exécution complète la validation via fakechroot ; elle ne repose
+pas sur les adaptateurs du laboratoire. Les commits de documentation ultérieurs
+peuvent utiliser `[skip ci]` : ils ne modifient pas le code testé et référencent
+explicitement le commit de cette exécution.
 
 ## Limites conservées
 

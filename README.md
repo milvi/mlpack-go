@@ -33,8 +33,17 @@ sudo apt-get install --no-install-recommends \
 ```
 
 Récupérer ensuite ce dépôt, par Git ou avec l'archive GitHub de la révision
-corrigée. Git n'est pas un prérequis du script lui-même. Depuis ce checkout,
-lancer **sans sudo** :
+corrigée. Avec Git déjà installé :
+
+```sh
+git clone https://github.com/milvi/mlpack-go.git
+cd mlpack-go
+git checkout a4cedd823d9c44d970a1330fe6ef8a2d4e27149c
+```
+
+Cette révision contient le code validé ; les commits de documentation ultérieurs
+peuvent compléter les preuves de test. Git n'est pas un prérequis du script
+lui-même. Depuis ce checkout, lancer **sans sudo** :
 
 ```sh
 set -o pipefail
@@ -71,13 +80,14 @@ intermédiaires pour diagnostic.
 Charger `env.sh`, puis, depuis le module de son application :
 
 ```sh
-go get github.com/milvi/mlpack-go@<commit-corrige>
+go get github.com/milvi/mlpack-go@v0.0.0-20261102004546-a4cedd823d9c
 go mod tidy
 ```
 
-Remplacer `<commit-corrige>` par le SHA d'une révision corrigée de ce fork.
-Conserver la pseudo-version retenue dans le `go.mod` de l'application. Ne pas
-utiliser une révision amont non corrigée avec ces instructions.
+Cette pseudo-version correspond à la révision corrigée ci-dessus et a été
+téléchargée et exécutée depuis un projet séparé, sans directive `replace`.
+La conserver dans le `go.mod` de l'application. Ne pas utiliser une révision
+amont non corrigée avec ces instructions.
 
 ```go
 import (
@@ -188,6 +198,10 @@ Ubuntu 26.04 sous un utilisateur ordinaire, puis les tests et l'exemple :
 docker build --progress=plain --build-arg JOBS=2 -t mlpack-go-verification .
 docker run --rm mlpack-go-verification
 ```
+
+Cette construction intégrale, les tests ordinaires, les contrôles cgo renforcés,
+les tests de mémoire native et l'exécution finale de k-means ont
+[réussi sur la révision de code indiquée plus haut](https://github.com/milvi/mlpack-go/actions/runs/41368925523).
 
 Les résultats réellement obtenus et les limites du laboratoire sont détaillés
 dans [corrections-et-validation.md](docs/corrections-et-validation.md). La
