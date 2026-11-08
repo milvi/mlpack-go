@@ -1,0 +1,23 @@
+package main
+
+import (
+	"fmt"
+	mlpack "github.com/milvi/mlpack-go"
+	"math/rand/v2"
+)
+
+func main() {
+	points := make([]float64, 10000*2)
+	random := rand.New(rand.NewPCG(42, 17))
+	for i := range points {
+		points[i] = random.Float64()
+	}
+	result, err := mlpack.Cluster(points, 2, 10, nil)
+	if err != nil {
+		panic(err)
+	}
+	if !result.Converged || len(result.Labels) != 10000 || result.Clusters != 10 {
+		panic("résultat inattendu")
+	}
+	fmt.Printf("OK : %d points, %d classes, %d itérations, convergence %t\n", len(result.Labels), result.Clusters, result.Iterations, result.Converged)
+}

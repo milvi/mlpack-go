@@ -1,0 +1,14 @@
+$ go mod verify
+all modules verified
+Durée : 0.164 s
+
+$ go run .
+OK : 10000 points, 10 classes, 29 itérations, convergence true
+Durée : 0.114 s
+
+$ go build -o ../projet-neuf-kmeans .
+Durée : 0.516 s
+
+$ ../projet-neuf-kmeans
+OK : 10000 points, 10 classes, 29 itérations, convergence true
+Durée : 0.032 s

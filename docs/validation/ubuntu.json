@@ -1,0 +1,171 @@
+{
+  "date": "2026-11-08",
+  "ubuntu": "26.04 amd64",
+  "go": "1.27.3",
+  "gcc": "15.2.0",
+  "armadillo": "15.2.1",
+  "native": {
+    "commit": "fa1b738da2211f05215e7668c56877b20190d939",
+    "tag": "v0.2.0-kmeans.1",
+    "run": "https://github.com/milvi/mlpack/actions/runs/42468656957",
+    "result": "success",
+    "checks": [
+      "55 en-têtes, fermeture exacte des inclusions",
+      "Go",
+      "AddressSanitizer",
+      "UndefinedBehaviorSanitizer",
+      "LeakSanitizer"
+    ],
+    "allocation_failures_kmeans": 390,
+    "allocation_failures_trees": 639
+  },
+  "frontend": {
+    "commit": "dd0146e41820151ae913d53d1e1710c4a7a28ada",
+    "tag": "v0.2.0-kmeans.1",
+    "run": "https://github.com/milvi/mlpack-go/actions/runs/42469099355",
+    "result": "success",
+    "checks": [
+      "go mod verify",
+      "go test",
+      "cgocheck2",
+      "restitutions natives",
+      "exemple",
+      "benchmark"
+    ],
+    "native_bytes_after_50_calls": 240,
+    "native_bytes_after_200_failed_calls": 464
+  },
+  "measurements": {
+    "utc": "2026-11-08T09:55:38.755241+00:00",
+    "machine": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+    "logical_cpus": 4,
+    "cpu": "AMD EPYC 9V45 96-Core Processor",
+    "trials": 1,
+    "iteration_limit": 100,
+    "measurements": [
+      {
+        "n": 100000,
+        "k_requested": 1000,
+        "k_actual": 1000,
+        "seed": 42,
+        "algorithm": "dualtree",
+        "threads": 1,
+        "iteration_limit": 100,
+        "iterations": 100,
+        "converged": false,
+        "seconds": 1.001093436,
+        "peak_rss_bytes": 24518656,
+        "go_heap_alloc_bytes": 2508712,
+        "inertia": 15.992719174506774,
+        "distance_calculations": 23483541
+      },
+      {
+        "n": 1000000,
+        "k_requested": 1000,
+        "k_actual": 1000,
+        "seed": 42,
+        "algorithm": "dualtree",
+        "threads": 1,
+        "iteration_limit": 100,
+        "iterations": 100,
+        "converged": false,
+        "seconds": 6.119845485,
+        "peak_rss_bytes": 171585536,
+        "go_heap_alloc_bytes": 24111016,
+        "inertia": 164.07611199776514,
+        "distance_calculations": 99098910
+      },
+      {
+        "n": 1000000,
+        "k_requested": 10000,
+        "k_actual": 10000,
+        "seed": 42,
+        "algorithm": "dualtree",
+        "threads": 1,
+        "iteration_limit": 100,
+        "iterations": 100,
+        "converged": false,
+        "seconds": 14.187046906,
+        "peak_rss_bytes": 172736512,
+        "go_heap_alloc_bytes": 24258472,
+        "inertia": 15.900105455547148,
+        "distance_calculations": 255115727
+      }
+    ],
+    "summary": [
+      {
+        "n": 100000,
+        "k": 1000,
+        "median_seconds": 1.001093436,
+        "min_seconds": 1.001093436,
+        "max_seconds": 1.001093436,
+        "median_peak_rss_bytes": 24518656,
+        "median_seconds_per_iteration": 0.01001093436,
+        "iterations": [
+          100
+        ],
+        "k_actual": [
+          1000
+        ],
+        "converged": [
+          false
+        ]
+      },
+      {
+        "n": 1000000,
+        "k": 1000,
+        "median_seconds": 6.119845485,
+        "min_seconds": 6.119845485,
+        "max_seconds": 6.119845485,
+        "median_peak_rss_bytes": 171585536,
+        "median_seconds_per_iteration": 0.06119845485,
+        "iterations": [
+          100
+        ],
+        "k_actual": [
+          1000
+        ],
+        "converged": [
+          false
+        ]
+      },
+      {
+        "n": 1000000,
+        "k": 10000,
+        "median_seconds": 14.187046906,
+        "min_seconds": 14.187046906,
+        "max_seconds": 14.187046906,
+        "median_peak_rss_bytes": 172736512,
+        "median_seconds_per_iteration": 0.14187046906,
+        "iterations": [
+          100
+        ],
+        "k_actual": [
+          10000
+        ],
+        "converged": [
+          false
+        ]
+      }
+    ],
+    "ratios": [
+      {
+        "case": "k=1000",
+        "n_ratio": 10,
+        "time_ratio": 6.113161134541691,
+        "rss_ratio": 6.998162378884063,
+        "effective_time_exponent": 0.7862658433474452,
+        "per_iteration_time_ratio": 6.113161134541691
+      },
+      {
+        "case": "k=10000",
+        "n_ratio": 10,
+        "time_ratio": 14.171551221718332,
+        "rss_ratio": 7.045105245573004,
+        "effective_time_exponent": 1.15141739083745,
+        "per_iteration_time_ratio": 14.17155122171833
+      }
+    ],
+    "interpretation": "Le quotient mesure cette distribution et ces convergences ; il ne démontre pas une complexité asymptotique. Le pic RSS inclut Go, C++, le runtime et les entrées/sorties."
+  }
+}

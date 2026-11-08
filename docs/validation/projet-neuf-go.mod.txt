@@ -1,0 +1,10 @@
+module exemple/verification-kmeans-seul
+
+go 1.27.3
+
+require github.com/milvi/mlpack-go v0.2.0-kmeans.1
+
+require (
+	github.com/milvi/mlpack v0.2.0-kmeans.1 // indirect
+	gonum.org/v1/gonum v0.17.0 // indirect
+)

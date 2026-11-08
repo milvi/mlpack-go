@@ -19,7 +19,7 @@ jobs:
         run: docker build --progress=plain -t mlpack-go-verification .
       - name: Exécuter k-means sur un processus neuf
         run: docker run --rm mlpack-go-verification
-      - name: Mesurer temps et mémoire sur trois graines
+      - name: Mesurer temps et mémoire à budget fixé
         run: >-
           docker run --rm --entrypoint python3 mlpack-go-verification
           tools/benchmark.py --binary /home/mlpack/kmeans --trials 1 --output /tmp/mesures.json

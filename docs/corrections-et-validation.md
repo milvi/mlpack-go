@@ -113,6 +113,25 @@ créé après succès. Go a ensuite téléchargé le [module publié](validation
 et passé [tous les tests du frontend](validation/tests-module-publie.log) avec
 `GOWORK=off`, sans remplacement local.
 
+La [validation Go Ubuntu 26.04](https://github.com/milvi/mlpack-go/actions/runs/42469099355)
+a réussi sur `dd0146e41820151ae913d53d1e1710c4a7a28ada`, puis publié le tag
+`v0.2.0-kmeans.1`. Les contrôles incluent `go mod verify`, les tests Go,
+`cgocheck2`, les restitutions, l’exemple et les mesures. Les variations natives
+Ubuntu sont de +240 octets après 50 appels et +464 octets après 200 erreurs.
+Les [résultats Ubuntu](validation/ubuntu.json) consignent les deux exécutions.
+
+Sur Ubuntu, un essai par taille, graine 42 et budget de 100 itérations :
+
+| n | k | Temps (s) | Pic RSS (Mio) |
+|---:|---:|---:|---:|
+| 100 000 | 1 000 | 1,001 | 23,38 |
+| 1 000 000 | 1 000 | 6,120 | 163,64 |
+| 1 000 000 | 10 000 | 14,187 | 164,73 |
+
+Les trois essais atteignent le budget sans convergence ; mêmes réserves que pour
+les mesures locales. Pour n multiplié par 10, le temps est multiplié par 6,11 à
+k fixé et par 14,17 avec k = n/100 ; la mémoire est multipliée par 7,00 et 7,05.
+
 Les workflows [natif](https://github.com/milvi/mlpack/actions/runs/42468656957) et
 [Go](../.github/workflows/ubuntu2604.yml) construisent dans Ubuntu 26.04 avec
 uniquement `build-essential` et `libarmadillo-dev` comme dépendances C++ de
@@ -120,7 +139,13 @@ développement. Les tests s’exécutent sous un utilisateur ordinaire ; le cont
 LeakSanitizer du pilote natif ajoute la capacité `SYS_PTRACE` dans son conteneur.
 Les préversions ne sont créées qu’après succès de l’intégration de leur dépôt.
 
-La publication du frontend est suivie d’un contrôle depuis un projet neuf
-pour vérifier les deux modules téléchargés, leurs empreintes et l’absence de `replace`.
+Un [projet Git neuf](validation/projet-neuf.json), sans workspace ni `replace`,
+a téléchargé les deux modules `v0.2.0-kmeans.1` et Gonum `v0.17.0`, puis exécuté
+`go mod verify`, `go run .` et `go build` avec succès. Son appel sur 10 000 points
+et 10 centres converge en 29 itérations. Le [journal](validation/projet-neuf.log),
+le [go.mod](validation/projet-neuf-go.mod.txt), le [go.sum](validation/projet-neuf-go.sum.txt)
+et le [programme](validation/projet-neuf-main.go.txt) sont conservés. Il utilise
+les variables CGO du laboratoire local ; la validation Ubuntu ci-dessus utilise
+les chemins APT ordinaires.
 Les contrôles portent sur les chemins k-means conservés et leurs utilitaires ;
 ils ne constituent pas une preuve pour toute entrée numérique imaginable.

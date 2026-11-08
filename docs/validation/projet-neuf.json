@@ -1,0 +1,104 @@
+{
+  "workspace": "off",
+  "replace": false,
+  "points": 10000,
+  "clusters": 10,
+  "iterations": 29,
+  "converged": true,
+  "modules": [
+    {
+      "Path": "exemple/verification-kmeans-seul"
+    },
+    {
+      "Path": "codeberg.org/go-fonts/liberation",
+      "Version": "v0.5.0"
+    },
+    {
+      "Path": "codeberg.org/go-latex/latex",
+      "Version": "v0.1.0"
+    },
+    {
+      "Path": "codeberg.org/go-pdf/fpdf",
+      "Version": "v0.10.0"
+    },
+    {
+      "Path": "git.sr.ht/~sbinet/gg",
+      "Version": "v0.6.0"
+    },
+    {
+      "Path": "github.com/ajstarks/svgo",
+      "Version": "v0.0.0-20211024235047-1546f124cd8b"
+    },
+    {
+      "Path": "github.com/campoy/embedmd",
+      "Version": "v1.0.0"
+    },
+    {
+      "Path": "github.com/goccmack/gocc",
+      "Version": "v1.0.2"
+    },
+    {
+      "Path": "github.com/golang/freetype",
+      "Version": "v0.0.0-20170609003504-e2365dfdc4a0"
+    },
+    {
+      "Path": "github.com/google/go-cmp",
+      "Version": "v0.6.0"
+    },
+    {
+      "Path": "github.com/milvi/mlpack",
+      "Version": "v0.2.0-kmeans.1",
+      "Sum": "h1:x+vFboNb0RqkOWuYSgeRBK4duZPHVTZa8fX3y912LHA=",
+      "GoModSum": "h1:DBnIehVsMhYoy/PCm2WaZn2syMbvJd+CvmzM5ATVNH4="
+    },
+    {
+      "Path": "github.com/milvi/mlpack-go",
+      "Version": "v0.2.0-kmeans.1",
+      "Sum": "h1:xlQvHrlKBQ0udpW0a7dIHCATOreXyMV5MlGUbpPW/G8=",
+      "GoModSum": "h1:buxHw99oR6B7hgdFol9i9f1a9NhOD+YyVC7HpUjiXZI="
+    },
+    {
+      "Path": "github.com/pmezard/go-difflib",
+      "Version": "v1.0.0"
+    },
+    {
+      "Path": "golang.org/x/image",
+      "Version": "v0.25.0"
+    },
+    {
+      "Path": "golang.org/x/mod",
+      "Version": "v0.23.0"
+    },
+    {
+      "Path": "golang.org/x/sync",
+      "Version": "v0.12.0"
+    },
+    {
+      "Path": "golang.org/x/text",
+      "Version": "v0.23.0"
+    },
+    {
+      "Path": "golang.org/x/tools",
+      "Version": "v0.30.0"
+    },
+    {
+      "Path": "gonum.org/v1/gonum",
+      "Version": "v0.17.0",
+      "Sum": "h1:VbpOemQlsSMrYmn7T2OUvQ4dqxQXU+ouZFQsZOx50z4=",
+      "GoModSum": "h1:El3tOrEuMpv2UdMrbNlKEh9vd86bmQ6vqIcDwxEOc1E="
+    },
+    {
+      "Path": "gonum.org/v1/plot",
+      "Version": "v0.15.2"
+    },
+    {
+      "Path": "gonum.org/v1/tools",
+      "Version": "v0.0.0-20200318103217-c168b003ce8c"
+    },
+    {
+      "Path": "rsc.io/pdf",
+      "Version": "v0.1.1"
+    }
+  ],
+  "verification": "go mod verify réussi ; go run et go build ordinaires réussis dans un projet Git neuf"
+}
