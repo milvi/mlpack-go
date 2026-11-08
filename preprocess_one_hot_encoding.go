@@ -2,95 +2,98 @@ package mlpack
 
 /*
 #cgo CFLAGS: -I./capi
-#cgo LDFLAGS: -L. -lmlpack_go_preprocess_one_hot_encoding
 #include <capi/preprocess_one_hot_encoding.h>
 #include <stdlib.h>
 */
-import "C" 
+import "C"
 
-import "gonum.org/v1/gonum/mat" 
+import "gonum.org/v1/gonum/mat"
+import native "github.com/milvi/mlpack"
 
 type PreprocessOneHotEncodingOptionalParam struct {
-    Dimensions []int
-    Verbose bool
+	Dimensions []int
+	Verbose    bool
 }
 
 func PreprocessOneHotEncodingOptions() *PreprocessOneHotEncodingOptionalParam {
-  return &PreprocessOneHotEncodingOptionalParam{
-    Verbose: false,
-  }
+	return &PreprocessOneHotEncodingOptionalParam{
+		Verbose: false,
+	}
 }
 
 /*
-  This utility takes a dataset and a vector of indices and does one-hot encoding
-  of the respective features at those indices. Indices represent the IDs of the
-  dimensions to be one-hot encoded.
-  
-  If no dimensions are specified with "Dimensions", then all categorical-type
-  dimensions will be one-hot encoded. Otherwise, only the dimensions given in
-  "Dimensions" will be one-hot encoded.
-  
-  The output matrix with encoded features may be saved with the "Output"
-  parameters.
+This utility takes a dataset and a vector of indices and does one-hot encoding
+of the respective features at those indices. Indices represent the IDs of the
+dimensions to be one-hot encoded.
 
-  So, a simple example where we want to encode 1st and 3rd feature from dataset
-  X into X_output would be
-  
-  // Initialize optional parameters for PreprocessOneHotEncoding().
-  param := mlpack.PreprocessOneHotEncodingOptions()
-  param.Dimensions = 1
-  param.Dimensions = 3
-  
-  X_output := mlpack.PreprocessOneHotEncoding(X, param)
+If no dimensions are specified with "Dimensions", then all categorical-type
+dimensions will be one-hot encoded. Otherwise, only the dimensions given in
+"Dimensions" will be one-hot encoded.
 
-  Input parameters:
+The output matrix with encoded features may be saved with the "Output"
+parameters.
 
-   - input (matrixWithInfo): Matrix containing data.
-   - Dimensions ([]int): Index of dimensions that need to be one-hot
-        encoded (if unspecified, all categorical dimensions are one-hot
-        encoded).
-   - Verbose (bool): Display informational messages and the full list of
-        parameters and timers at the end of execution.
+So, a simple example where we want to encode 1st and 3rd feature from dataset
+X into X_output would be
 
-  Output parameters:
+// Initialize optional parameters for PreprocessOneHotEncoding().
+param := mlpack.PreprocessOneHotEncodingOptions()
+param.Dimensions = 1
+param.Dimensions = 3
 
-   - output (mat.Dense): Matrix to save one-hot encoded features data to.
+X_output := mlpack.PreprocessOneHotEncoding(X, param)
 
- */
-func PreprocessOneHotEncoding(input *matrixWithInfo, param *PreprocessOneHotEncodingOptionalParam) (*mat.Dense) {
-  params := getParams("preprocess_one_hot_encoding")
-  defer cleanParams(params)
-  timers := getTimers()
-  defer cleanTimers(timers)
+Input parameters:
 
-  disableBacktrace()
-  disableVerbose()
-  // Detect if the parameter was passed; set if so.
-  gonumToArmaMatWithInfo(params, "input", input)
-  setPassed(params, "input")
+  - input (matrixWithInfo): Matrix containing data.
+  - Dimensions ([]int): Index of dimensions that need to be one-hot
+    encoded (if unspecified, all categorical dimensions are one-hot
+    encoded).
+  - Verbose (bool): Display informational messages and the full list of
+    parameters and timers at the end of execution.
 
-  // Detect if the parameter was passed; set if so.
-  if param.Dimensions != nil {
-    setParamVecInt(params, "dimensions", param.Dimensions)
-    setPassed(params, "dimensions")
-  }
+Output parameters:
 
-  // Detect if the parameter was passed; set if so.
-  if param.Verbose != false {
-    setParamBool(params, "verbose", param.Verbose)
-    setPassed(params, "verbose")
-    enableVerbose()
-  }
+  - output (mat.Dense): Matrix to save one-hot encoded features data to.
+*/
+func PreprocessOneHotEncoding(input *matrixWithInfo, param *PreprocessOneHotEncodingOptionalParam) *mat.Dense {
+	unlock := native.Acquire()
+	defer unlock()
+	params := getParams("preprocess_one_hot_encoding")
+	defer cleanParams(params)
+	timers := getTimers()
+	defer cleanTimers(timers)
 
-  // Mark all output options as passed.
-  setPassed(params, "output")
+	disableBacktrace()
+	disableVerbose()
+	// Detect if the parameter was passed; set if so.
+	gonumToArmaMatWithInfo(params, "input", input)
+	setPassed(params, "input")
 
-  // Call the mlpack program.
-  C.mlpackPreprocessOneHotEncoding(params.mem, timers.mem)
+	// Detect if the parameter was passed; set if so.
+	if param.Dimensions != nil {
+		setParamVecInt(params, "dimensions", param.Dimensions)
+		setPassed(params, "dimensions")
+	}
 
-  // Initialize result variable and get output.
-  var outputPtr mlpackArma
-  output := outputPtr.armaToGonumMat(params, "output")
-  // Return output(s).
-  return output
+	// Detect if the parameter was passed; set if so.
+	if param.Verbose != false {
+		setParamBool(params, "verbose", param.Verbose)
+		setPassed(params, "verbose")
+		enableVerbose()
+	}
+
+	// Mark all output options as passed.
+	setPassed(params, "output")
+
+	// Call the mlpack program.
+	C.mlpackPreprocessOneHotEncoding(params.mem, timers.mem)
+	checkNative()
+
+	// Initialize result variable and get output.
+	var outputPtr mlpackArma
+	output := outputPtr.armaToGonumMat(params, "output")
+	// Return output(s).
+	params.complete = true
+	return output
 }

@@ -1,0 +1,32 @@
+{
+  "builds": [
+    {
+      "name": "préparation",
+      "seconds": 1.1565297249999276,
+      "native_compilations": 0
+    },
+    {
+      "name": "sans modification",
+      "seconds": 0.1567618279987073,
+      "native_compilations": 0
+    },
+    {
+      "name": "horodatage seul modifié",
+      "seconds": 0.17022364000149537,
+      "native_compilations": 0
+    },
+    {
+      "name": "en-tête imbriqué modifié",
+      "seconds": 437.1655050320005,
+      "native_compilations": 49
+    },
+    {
+      "name": "source restaurée",
+      "seconds": 1.076811232000182,
+      "native_compilations": 0
+    }
+  ],
+  "source_marker_in_binary": false,
+  "binary_bytes": 25997776,
+  "limitation": "Les en-têtes et bibliothèques APT restent extérieurs au cache Go ; forcer go build -a après leur mise à jour."
+}

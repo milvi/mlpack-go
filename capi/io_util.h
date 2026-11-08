@@ -1,5 +1,5 @@
 /**
- * @file bindings/go/mlpack/capi/io_util.h
+ * @file bindings/go/capi/io_util.h
  * @author Yasmine Dumouchel
  * @author Yashwant Singh
  *
@@ -76,7 +76,7 @@ void mlpackSetParamString(void* params,
 /**
  * Set the parameter to the given value, given that the type is a pointer.
  */
-void mlpackSetParamPtr(void* params, const char* identifier, double* ptr);
+
 
 /**
  * Set the int vector parameter to the given value.
@@ -129,7 +129,6 @@ bool mlpackGetParamBool(void* params, const char* identifier);
 /**
  * Get the vector<int> parameter associated with specified identifier.
  */
-void* mlpackGetVecIntPtr(void* params, const char* identifier);
 
 /**
  * Get the vector<string> parameter associated with specified identifier.
@@ -141,12 +140,12 @@ const char* mlpackGetVecStringPtr(void* params,
 /**
  * Get the vector<int> parameter's size.
  */
-int mlpackVecIntSize(void* params, const char* identifier);
+size_t mlpackVecIntSize(void* params, const char* identifier);
 
 /**
  * Get the vector<string> parameter's size.
  */
-int mlpackVecStringSize(void* params, const char* identifier);
+size_t mlpackVecStringSize(void* params, const char* identifier);
 
 /**
  * Set parameter as passed.

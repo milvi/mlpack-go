@@ -1,209 +1,175 @@
-# mlpack pour Go — fork corrigé, Ubuntu 26.04 amd64
+# mlpack pour Go : compilation automatique du C++
 
-Ce fork fournit les wrappers Go de **mlpack 4.8.0**, des corrections de propriété
-mémoire et une installation locale vérifiée avec **Go 1.27.3**. Le module est
-`github.com/milvi/mlpack-go`. Les bibliothèques C++ correspondantes sont
-construites par le script ; elles ne sont pas incluses dans le module Go.
+Module `github.com/milvi/mlpack-go`, basé sur **mlpack 4.8.0**, avec **Go 1.27.3**
+et **Gonum v0.17.0**. Le code natif est un second module :
+[`github.com/milvi/mlpack`](https://github.com/milvi/mlpack).
+Les deux versions de module sont indépendantes de la version amont C++.
 
-Les corrections du générateur et de l'interface native sont conservées dans
-[milvi/mlpack](https://github.com/milvi/mlpack). Le présent dépôt contient aussi
-leur [patch pour la version 4.8.0](patches/mlpack-4.8.0-go-memory.patch), dont
-l'empreinte est contrôlée par l'installateur. **Un seul checkout de ce dépôt
-suffit pour installer et lancer l'exemple.**
+## Installation sur Ubuntu 26.04 amd64
 
-Lire [l'audit amont](docs/audit-amont.md) pour les défauts identifiés et
-[les corrections et validations](docs/corrections-et-validation.md) pour leur
-portée exacte. Les modèles opaques, les exceptions des algorithmes et les appels
-concurrents ne bénéficient pas d'une garantie générale dans ce fork.
-
-## Installation
-
-Ubuntu **26.04**, architecture **amd64 / x86-64**, dépôts comprenant `universe`.
-Examiner d'abord la transaction APT, puis installer les prérequis :
+Avec Go installé et depuis le projet qui possède déjà son `go.mod` :
 
 ```sh
 sudo apt-get update
-apt-get --simulate install --no-install-recommends \
-  build-essential cmake pkg-config curl ca-certificates patch \
-  libarmadillo-dev libensmallen-dev libcereal-dev
-
-sudo apt-get install --no-install-recommends \
-  build-essential cmake pkg-config curl ca-certificates patch \
-  libarmadillo-dev libensmallen-dev libcereal-dev
+sudo apt-get install --no-install-recommends build-essential libarmadillo-dev libensmallen-dev libcereal-dev ca-certificates
+go get github.com/milvi/mlpack-go@v0.1.0
+go build -p 2 ./...
 ```
 
-Récupérer ensuite ce dépôt, par Git ou avec l'archive GitHub de la révision
-corrigée. Avec Git déjà installé :
+Gonum v0.17.0 est la version minimale demandée par ce module et la dernière
+version publiée vérifiée le 8 novembre 2026. Une version plus récente déjà
+demandée par le projet est conservée.
+`@latest` demande la dernière version publiée au moment de la commande.
+`go get github.com/milvi/mlpack-go` utilise aussi la version de module retenue
+par Go, sans checkout Git manuel. Conserver `go.mod` et `go.sum` dans le projet.
+Un nouveau projet commence par `go mod init exemple/monprojet`.
 
-```sh
-git clone https://github.com/milvi/mlpack-go.git
-cd mlpack-go
-git checkout a4cedd823d9c44d970a1330fe6ef8a2d4e27149c
-```
+La première compilation construit encore les 46 méthodes historiques et les
+utilitaires communs. Elle prend plusieurs minutes et de la mémoire. Sur une
+petite machine : `go build -p 2 ./...` limite les compilations simultanées.
+Les compilations suivantes utilisent le cache standard de Go.
 
-Cette révision contient le code validé ; les commits de documentation ultérieurs
-peuvent compléter les preuves de test. Git n'est pas un prérequis du script
-lui-même. Depuis ce checkout, lancer **sans sudo** :
+**Aucun installateur, patch à appliquer, `env.sh`, SDK Go privé, CMake ou `.so`
+mlpack à installer.** Seule APT demande les droits administrateur. Helix utilise
+l’environnement Go normal du projet. Les autres méthodes restent disponibles ;
+l’extraction future de k-means constitue une autre étape.
 
-```sh
-set -o pipefail
-bash installer.sh 2>&1 | tee installation-mlpack.log
-```
-
-Deux compilations C++ sont lancées simultanément par défaut. Pour limiter leur
-consommation mémoire : `JOBS=1 bash installer.sh`. La première construction
-compile les **47 bibliothèques natives** liées par le package Go complet ; elle
-peut prendre plusieurs minutes. Le téléchargement des dépendances par CMake est
-désactivé. Go et mlpack sont téléchargés en HTTPS et vérifiés par SHA-256.
-
-Le script installe un SDK Go privé. Il ne remplace pas une installation de Go
-existante. Après succès :
-
-```sh
-source "$HOME/.local/opt/mlpack-go-milvi/4.8.0-go1.27.3/env.sh"
-"$HOME/.local/opt/mlpack-go-milvi/4.8.0-go1.27.3/bin/kmeans-demo"
-
-# Depuis le checkout :
-go run -buildvcs=false ./examples/kmeans
-go test -buildvcs=false ./...
-```
-
-L'exemple vérifie neuf points de ℝ³, trois groupes, les étiquettes, les centres
-avec une tolérance de 10⁻¹² et l'absence de modification des entrées, pour les
-algorithmes `naive` et `dualtree`. `INSTALLATION-VERIFIEE` est écrit dans le
-préfixe uniquement après succès de la compilation et de cet exemple. Une reprise
-commence par retirer l'ancien marqueur de succès et conserve les fichiers
-intermédiaires pour diagnostic.
-
-## Utiliser le fork dans son projet
-
-Charger `env.sh`, puis, depuis le module de son application :
-
-```sh
-go get github.com/milvi/mlpack-go@v0.0.0-20261102004546-a4cedd823d9c
-go mod tidy
-```
-
-Cette pseudo-version correspond à la révision corrigée ci-dessus et a été
-téléchargée et exécutée depuis un projet séparé, sans directive `replace`.
-La conserver dans le `go.mod` de l'application. Ne pas utiliser une révision
-amont non corrigée avec ces instructions.
+## Un appel, des slices conservées par Go
 
 ```go
+package main
+
 import (
+    "fmt"
     mlpack "github.com/milvi/mlpack-go"
-    "gonum.org/v1/gonum/mat"
 )
 
-// Une ligne par point : n × d côté Go.
-donnees := mat.NewDense(4, 2, []float64{0, 0, 0, 1, 10, 10, 10, 11})
-options := mlpack.KmeansOptions()
-options.Algorithm = "dualtree"
-options.LabelsOnly = true
-options.Seed = 42
-centres, etiquettes := mlpack.Kmeans(2, donnees, options)
+func main() {
+    points := []float64{0, 0, 0, 1, 10, 10, 10, 11} // n lignes de d coordonnées
+    resultat, err := mlpack.Cluster(points, 2, 2, nil)
+    if err != nil { panic(err) }
+    fmt.Println(resultat.Centers, resultat.Labels)
+}
 ```
 
-`Kmeans` reçoit **le nombre de classes avant les données**. Les étiquettes sont
-des valeurs entières stockées dans une matrice Gonum de `float64`. Sans
-`LabelsOnly`, la sortie contient aussi les coordonnées des points. Les matrices
-retournées appartiennent à Go et restent valides après libération des paramètres
-natifs. Gonum **0.7.0** est conservé pour éviter une migration d'API dans ce
-correctif. Un projet sélectionnant une autre version de Gonum doit être revalidé.
+Par défaut : dual-tree avec **KD-tree** (arbre de partition par coordonnées),
+initialisation reproductible sans remise, graine 42, un thread, au plus
+1000 itérations et seuil de déplacement global des centres 10⁻⁵.
+`DefaultOptions()` permet de modifier ces valeurs ; `InitialCentroids` fournit
+une initialisation explicite et `ClusterDense` accepte une matrice Gonum,
+y compris une vue avec un pas mémoire non contigu.
 
-Lancer Helix et ses outils Go depuis le terminal ayant chargé `env.sh` pour
-qu'ils héritent de la même chaîne de compilation et des chemins de liaison.
+Le C++ copie les entrées, calcule, écrit dans les slices de sortie Go et détruit
+ses arbres et matrices avant le retour. Il ne conserve aucun pointeur Go.
+Aucun `Close` n’est nécessaire pour `Result`. Les étiquettes sont des `int`.
+L’appel rend aussi inertie, nombre d’itérations et indicateur de convergence.
+Une limite d’itérations atteinte donne `Converged == false` : le résultat ne
+constitue pas alors un point fixe. Les coordonnées et les calculs doivent rester
+finis ; changer l’échelle des données en cas de débordement.
 
-## Ce qui est écrit sur la machine
+Les centres vides restent à leur place pendant les itérations, puis sont retirés
+au retour ; les étiquettes sont renumérotées. `KeepEmptyClusters` conserve ces
+centres au retour. Le nombre de classes effectivement rendu peut donc être
+inférieur à k. L’affectation finale utilise une recherche exacte avec KD-tree.
 
-Notons P le préfixe `$HOME/.local/opt/mlpack-go-milvi/4.8.0-go1.27.3` et C le
-cache `$HOME/.cache/mlpack-go-milvi/4.8.0-go1.27.3` avec les réglages habituels.
+Les conversions historiques copient aussi les matrices d’entrée dans une mémoire
+possédée par le C++. Un modèle ne peut ainsi conserver un emprunt vers une slice
+Go après le retour. Aucun `runtime.Pinner` persistant n’est nécessaire ; cgo épingle
+automatiquement les arguments pendant chaque appel.
 
-| Emplacement | Contenu | Gestionnaire |
+Les appels natifs sont sérialisés pour protéger l’état partagé historique de
+mlpack. Les réglages de journalisation et d’OpenMP sont restaurés par `Cluster`.
+OpenMP est l’interface de parallélisme C++ ; le choix `Threads: 1` évite la
+surallocation de threads par défaut. Les vieux appels restent accessibles sous
+leurs noms d’origine, par exemple `Kmeans`. Leurs exceptions deviennent des
+`panic(error)` pour conserver leurs signatures. Chaque modèle opaque historique
+possède maintenant `Close() error` : tous ses alias partagent sa durée de vie ;
+fermer l’un ferme les autres. Un nettoyage automatique sert de dernier recours.
+
+## Où vont les fichiers ?
+
+```mermaid
+flowchart TD
+    P["Projet : go.mod et go.sum"] -->|go get| M["GOMODCACHE : sources Go et C++ versionnées"]
+    P -->|go build| G["Compilateurs Go et C++ via cgo"]
+    M --> G
+    A["APT : en-têtes et bibliothèques système"] --> G
+    G --> C["GOCACHE : objets compilés"]
+    C --> E["Exécutable du projet"]
+    A -->|bibliothèques dynamiques| E
+```
+
+Le même schéma est proposé dans [quiver](docs/installation-quiver.md).
+
+| Emplacement habituel | Contenu | Qui écrit ? |
 |---|---|---|
-| `/usr/bin`, `/usr/include`, `/usr/lib`, etc. | Compilateurs, outils et dépendances mathématiques, uniquement lors de la commande APT | APT / dpkg |
-| Checkout courant | Wrappers Go, déclarations C et exemple ; le script les lit sans copier une distribution Go amont | Git / utilisateur |
-| `P/go/` | SDK officiel Go 1.27.3 | Installateur |
-| `P/lib/libmlpack_go_*.so` | 46 bibliothèques de méthodes et une bibliothèque utilitaire native | CMake |
-| `P/include/mlpack.hpp`, `P/include/mlpack/` | En-têtes C++ mlpack 4.8.0 | CMake |
-| `P/lib/pkgconfig/mlpack.pc` et autres fichiers du manifeste CMake | Métadonnées de l'installation C++ | CMake |
-| `P/bin/kmeans-demo` | Exemple Go compilé depuis ce checkout | Installateur |
-| `P/env.sh` | Variables à charger explicitement dans une session | Installateur |
-| `P/share/audit/` | Manifeste CMake, empreintes des fichiers Go, versions et résultat k-means | Installateur |
-| `C/` | Archives vérifiées, sources C++ patchées, objets et configuration de construction | Installateur |
-| `go env GOMODCACHE`, `go env GOCACHE` | Modules téléchargés et cache de compilation | Go |
+| `/usr/bin`, `/usr/include`, `/usr/lib` | GCC/G++, make, Armadillo, ensmallen, cereal et dépendances BLAS/LAPACK, etc. | APT/dpkg |
+| `go env GOMODCACHE`, habituellement `~/go/pkg/mod` | Sources téléchargées des modules, dont le C++ mlpack | Go |
+| `go env GOCACHE`, habituellement `~/.cache/go-build` | Objets Go/C++ et résultats de compilation réutilisables | Go |
+| Répertoire temporaire du système | Travail intermédiaire d’une compilation | Go |
+| Projet | `go.mod`, `go.sum` et exécutable demandé | Go |
 
-Les caches Go utilisent les réglages existants, habituellement `~/go/pkg/mod`
-et `~/.cache/go-build`. Go peut aussi écrire les données de vérification sumdb
-et ses compteurs locaux de télémétrie selon son mode préexistant. Le script ne
-modifie pas ce mode. La transaction APT dépend des paquets déjà installés : elle
-peut ajouter BLAS, LAPACK, ARPACK, SuperLU, HDF5 et leurs dépendances, ou mettre à
-jour des paquets existants. Le script n'installe pas `libmlpack-dev` d'Ubuntu.
+`.cache` peut être conservé entre sessions, mais doit pouvoir être supprimé :
+`go clean -cache` force la prochaine reconstruction. `go clean -modcache`
+supprime les sources téléchargées de **tous** les modules. Ces commandes ne sont
+pas nécessaires à l’utilisation normale. Les anciens préfixes privés sous
+`~/.local/opt/mlpack-go-milvi/…` et `~/.cache/mlpack-go-milvi/…` ne servent plus.
+Leur suppression éventuelle reste une opération manuelle après vérification de
+leur contenu et des anciens exécutables qui les utilisent.
 
-Le script ne fait aucun `sudo`, `go env -w`, `ldconfig`, changement de `.bashrc`
-ou de `/etc/ld.so.conf.d`. Les bibliothèques restent dans P. Les paquets APT
-peuvent enregistrer leurs alternatives BLAS/LAPACK ; l'installateur ne les
-reconfigure pas et n'ajoute pas OpenBLAS silencieusement.
+Le binaire embarque les objets mlpack, mais dépend toujours des bibliothèques
+système indiquées par `ldd`. Une machine qui compile doit avoir les paquets `-dev` ;
+une machine qui exécute doit avoir leurs bibliothèques d’exécution compatibles.
+Aucun chemin absolu vers un préfixe personnel n’est inscrit par ce module.
+Aucune modification de `.bashrc`, `go env -w`, `ldconfig` ou installation dans
+`/usr/local` n’est effectuée.
 
-`env.sh` préfixe `PATH` avec `P/go/bin`, fixe `GOROOT`, `CGO_ENABLED=1` et
-`GOTOOLCHAIN=local`, remplace `CGO_LDFLAGS` par `-LP/lib -Wl,-rpath,P/lib` et
-ajoute `P/lib/pkgconfig` à `PKG_CONFIG_PATH`, uniquement dans la session qui le
-charge. Il ne fixe pas `LD_LIBRARY_PATH`. Le chemin absolu de P est inscrit
-dans les programmes Go compilés ainsi ; les bibliothèques natives retrouvent
-leurs voisines grâce à `$ORIGIN`. Déplacer P demande de reconstruire ces
-programmes.
+## Versions, intégrité et recompilation
 
-Pour choisir les deux répertoires avant la première installation :
+Go retient **une version par chemin de module** : la plus élevée parmi les
+versions minimales demandées dans le graphe de dépendances. C’est la sélection
+minimale de version, ou MVS (*Minimal Version Selection*). Si le projet demande
+une version de Gonum plus récente que v0.17.0, mlpack et le projet utilisent tous
+deux cette version. Go ne cherche pas une mise à jour à chaque `go build`.
+`go get gonum.org/v1/gonum@latest` demande explicitement cette mise à jour.
+La compatibilité d’une future version de Gonum doit ensuite être vérifiée.
 
-```sh
-MLPACK_PREFIX="$HOME/.local/opt/mlpack-personnel" \
-MLPACK_BUILD_CACHE="$HOME/.cache/mlpack-personnel" \
-JOBS=2 bash installer.sh
-```
+| Changement | Effet sur le prochain `go build` |
+|---|---|
+| Nouveau commit Git sans changement des entrées de compilation | Pas de reconstruction des paquets pour ce seul motif ; les métadonnées VCS peuvent modifier le lien final |
+| Source Go, C/C++, déclaration C ou en-tête mlpack modifié | Recompilation du paquet concerné et reconstruction des dépendants nécessaires |
+| En-tête C++ dans un sous-répertoire mlpack | Pris en compte explicitement dans ce module grâce à `go:embed` |
+| Version Go, options de compilation, architecture ou paramètres cgo | Autre clé de cache : les actions concernées sont reconstruites |
+| `go get …@nouvelle-version` | Téléchargement et vérification ; compilation lors du prochain build si l’entrée de cache manque |
+| Paquet APT natif remplacé | Go ne suit pas son contenu : reconstruire explicitement avec `go build -a ./...` |
+| Nouveau commit sur GitHub sans `go get` | Aucun changement du code utilisé par le projet |
 
-Les chemins doivent être absolus, sans espaces, deux-points ni caractères de
-citation. Éviter toute construction concurrente sur le même préfixe. Un verrou
-du cache est pris lorsque `flock` est disponible.
+Le **programme `go`** calcule les empreintes cryptographiques des sources
+distribuées sous forme de module et du fichier `go.mod` lors du téléchargement.
+Il les compare à `go.sum`, et, pour un module public avec les réglages normaux,
+au journal de vérification `sum.golang.org`. Ce contrôle d’intégrité est distinct
+des clés du cache de compilation. Il ne signe pas un commit Git et ne déclenche
+pas une compilation. `go mod verify` vérifie le cache de modules local.
 
-## Installation antérieure et désinstallation
+Ne jamais déplacer ou réécrire un tag déjà publié. Modifier le C++ signifie un
+commit sur `milvi/mlpack`, un nouveau tag de ce module, puis la mise à jour de
+sa dépendance et un nouveau tag dans `milvi/mlpack-go`. Aucun patch séparé.
+Le fichier `native.go` référence les sources imbriquées avec `go:embed` pour que
+Go les ajoute aux entrées du cache ; sa variable inutilisée doit être éliminée du
+binaire. Ce comportement fait partie des contrôles de validation.
+Les en-têtes installés par APT sont extérieurs à ce mécanisme.
 
-Une copie manuelle d'Armadillo, ensmallen ou cereal dans `/usr/local` peut masquer
-APT. Le script refuse les emplacements usuels détectés et affiche le fichier
-concerné. Il ne supprime rien. Examiner l'ancienne installation, ses utilisateurs
-et son éventuel `install_manifest.txt` avant de déplacer ses fichiers. `dpkg -S
-/chemin/du/fichier` permet de chercher son propriétaire APT.
-
-La désinstallation locale consiste à supprimer P et C **après vérification de
-leur contenu**. Les programmes liés à P perdent alors leurs bibliothèques. Les
-paquets APT, le checkout et les caches partagés de Go restent en place. Aucune
-configuration du shell n'est à réparer.
-
-## Validation reproductible
-
-Depuis le checkout et après chargement de `env.sh` :
+## Tests et maintenance
 
 ```sh
-# Contrôles supplémentaires des pointeurs Go conservés côté C.
-GOEXPERIMENT=cgocheck2 go test -buildvcs=false ./...
-
-# Diagnostic glibc : allocations natives, distinctes du tas Go.
-GOMAXPROCS=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-  go test -buildvcs=false -tags mlpack_memtest -run TestNative -v .
+go test ./...
+GOEXPERIMENT=cgocheck2 go test ./...
+go test -tags mlpack_memtest -run TestNative -v .
+go run ./cmd/kmeans -n 100000 -k 1000
 ```
 
-Une recette Docker et un workflow GitHub Actions exécutent l'installation dans
-Ubuntu 26.04 sous un utilisateur ordinaire, puis les tests et l'exemple :
-
-```sh
-docker build --progress=plain --build-arg JOBS=2 -t mlpack-go-verification .
-docker run --rm mlpack-go-verification
-```
-
-Cette construction intégrale, les tests ordinaires, les contrôles cgo renforcés,
-les tests de mémoire native et l'exécution finale de k-means ont
-[réussi sur la révision de code indiquée plus haut](https://github.com/milvi/mlpack-go/actions/runs/41368925523).
-
-Les résultats réellement obtenus et les limites du laboratoire sont détaillés
-dans [corrections-et-validation.md](docs/corrections-et-validation.md). La
-reproductibilité des sources mlpack/Go et du patch est fixée par leurs empreintes ;
-les dépôts APT et le tag d'image Ubuntu peuvent recevoir des mises à jour.
+Le [rapport](docs/corrections-et-validation.md) distingue les vérifications
+effectivement exécutées et leur portée. La recette Docker et GitHub Actions
+servent à reproduire un environnement Ubuntu 26.04 minimal ; ils ne sont pas
+nécessaires pour importer le module. L’ancienne recette Travis est retirée.
+Les détails de publication sont dans [rel/deployment.md](rel/deployment.md).

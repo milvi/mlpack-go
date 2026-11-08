@@ -1,3 +1,5 @@
+> Audit historique du 2 novembre 2026 : décrit la distribution antérieure à la compilation automatique. Voir le rapport actuel pour les corrections et limites restantes.
+
 # Audit amont de mlpack / Go — avant corrections
 
 > **État amont avant correction.** Ce rapport est conservé comme historique de
@@ -347,7 +349,7 @@ nouvelle date et les dépendances de compilation usuelles restent actives.
 L'exemple est compilé sans métadonnées d'un éventuel dépôt Git parent.
 
 Les preuves du diagnostic mémoire initial et les journaux des nouveaux tests
-sont conservés dans [validation/](validation/). Le premier kit d’audit conservait
+sont conservés dans [validation/](validation/historique-2026-11-02/). Le premier kit d’audit conservait
 aussi les journaux complets de construction, la transaction APT et les manifestes
 de cette première installation. Le script actuel produit ses propres manifestes
 dans le préfixe d’installation.

@@ -1,5 +1,5 @@
 /**
- * @file bindings/go/mlpack/capi/arma_util.h
+ * @file bindings/go/capi/arma_util.h
  * @author Yasmine Dumouchl
  * @author Yashwant Singh
  *
@@ -80,82 +80,76 @@ void mlpackToArmaUcol(void* params,
 /**
  * Return the memory pointer of an Armadillo mat object.
  */
-void* mlpackArmaPtrMat(void* params, const char* identifier);
 
 /**
  * Return the memory pointer of an Armadillo umat object.
  */
-void* mlpackArmaPtrUmat(void* params, const char* identifier);
 
 /**
  * Return the memory pointer of an Armadillo row object.
  */
-void* mlpackArmaPtrRow(void* params, const char* identifier);
 
 /**
  * Return the memory pointer of an Armadillo urow object.
  */
-void* mlpackArmaPtrUrow(void* params, const char* identifier);
 
 /**
  * Return the memory pointer of an Armadillo col object.
  */
-void* mlpackArmaPtrCol(void* params, const char* identifier);
 
 /**
  * Return the memory pointer of an Armadillo ucol object.
  */
-void* mlpackArmaPtrUcol(void* params, const char* identifier);
 
 /**
  * Return the number of rows in a Armadillo mat.
  */
-int mlpackNumRowMat(void* params, const char* identifier);
+size_t mlpackNumRowMat(void* params, const char* identifier);
 
 /**
  * Return the number of columns in an Armadillo mat.
  */
-int mlpackNumColMat(void* params, const char* identifier);
+size_t mlpackNumColMat(void* params, const char* identifier);
 
 /**
  * Return the number of elements in an Armadillo mat.
  */
-int mlpackNumElemMat(void* params, const char* identifier);
+size_t mlpackNumElemMat(void* params, const char* identifier);
 
 /**
  * Return the number of rows in an Armadillo umat.
  */
-int mlpackNumRowUmat(void* params, const char* identifier);
+size_t mlpackNumRowUmat(void* params, const char* identifier);
 
 /**
  * Return the number of columns in an Armadillo umat.
  */
-int mlpackNumColUmat(void* params, const char* identifier);
+size_t mlpackNumColUmat(void* params, const char* identifier);
 
 /**
  * Return the number of elements in an Armadillo umat.
  */
-int mlpackNumElemUmat(void* params, const char* identifier);
+size_t mlpackNumElemUmat(void* params, const char* identifier);
 
 /**
  * Return the number of elements in an Armadillo row.
  */
-int mlpackNumElemRow(void* params, const char* identifier);
+size_t mlpackNumElemRow(void* params, const char* identifier);
 
 /**
  * Return the number of elements in an Armadillo urow.
  */
-int mlpackNumElemUrow(void* params, const char* identifier);
+size_t mlpackNumElemUrow(void* params, const char* identifier);
 
 /**
  * Return the number of elements in an Armadillo col.
  */
-int mlpackNumElemCol(void* params, const char* identifier);
+size_t mlpackNumElemCol(void* params, const char* identifier);
 
 /**
  * Return the number of elements in an Armadillo ucol.
  */
-int mlpackNumElemUcol(void* params, const char* identifier);
+size_t mlpackNumElemUcol(void* params, const char* identifier);
 
 /**
  * Call IO::SetParam<std::tuple<DatasetInfo, arma::mat>>().
@@ -170,23 +164,23 @@ void mlpackToArmaMatWithInfo(void* params,
 /**
  * Get the number of elements in a matrix with DatasetInfo parameter.
  */
-int mlpackArmaMatWithInfoElements(void* params, const char* identifier);
+size_t mlpackArmaMatWithInfoElements(void* params, const char* identifier);
 
 /**
  * Get the number of rows in a matrix with DatasetInfo parameter.
  */
-int mlpackArmaMatWithInfoRows(void* params, const char* identifier);
+size_t mlpackArmaMatWithInfoRows(void* params, const char* identifier);
 
 /**
  * Get the number of columns in a matrix with DatasetInfo parameter.
  */
-int mlpackArmaMatWithInfoCols(void* params, const char* identifier);
+size_t mlpackArmaMatWithInfoCols(void* params, const char* identifier);
 
 /**
  * Get a pointer to the memory of the matrix.  The calling function is expected
  * to own the memory.
  */
-void* mlpackArmaPtrMatWithInfoPtr(void* params, const char* identifier);
+
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }

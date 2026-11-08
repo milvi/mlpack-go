@@ -1,18 +1,14 @@
-SHELL := /bin/bash
-PREFIX ?= $(HOME)/.local/opt/mlpack-go-milvi/4.8.0-go1.27.3
-.PHONY: help install test example memory-test
-
-help:
-	@bash installer.sh --help
-
-install:
-	bash installer.sh
+.PHONY: test example memory-test benchmark
 
 test:
-	. "$(PREFIX)/env.sh"; go test -buildvcs=false ./...
+	go test ./...
 
 example:
-	. "$(PREFIX)/env.sh"; go run -buildvcs=false ./examples/kmeans
+	go run ./cmd/kmeans -n 100000 -k 1000
 
 memory-test:
-	. "$(PREFIX)/env.sh"; GOMAXPROCS=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 go test -buildvcs=false -tags mlpack_memtest -run 'TestNative' -v .
+	go test -tags mlpack_memtest -run TestNative -v .
+
+benchmark:
+	go build -o ./kmeans-mesure ./cmd/kmeans
+	python3 tools/benchmark.py --binary ./kmeans-mesure --output docs/validation/mesures.json

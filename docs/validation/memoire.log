@@ -1,0 +1,223 @@
+=== RUN   TestNativeMemoryCluster
+    cluster_memory_test.go:34: Cluster : 50 appels × 100000 points, variation native 6384 octets
+--- PASS: TestNativeMemoryCluster (0.78s)
+=== RUN   TestNativeMemoryModelClose
+    cluster_memory_test.go:61: 1000 modèles créés et fermés : variation native 6528 octets
+--- PASS: TestNativeMemoryModelClose (0.03s)
+=== RUN   TestNativeMemoryFailedModel
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+[0;31m[FATAL] [0mTest data dimensionality (3) must be the same as training data (2)!
+
+    cluster_memory_test.go:94: 100 modèles dont l’appel échoue avant export : variation native 5040 octets
+--- PASS: TestNativeMemoryFailedModel (0.03s)
+=== RUN   TestNativeMemoryAfterKmeans
+    memory_linux_test.go:36: 50 appels × 100000 points : variation native 9072 octets
+--- PASS: TestNativeMemoryAfterKmeans (0.24s)
+=== RUN   TestNativeCStringLifetime
+    memory_linux_test.go:64: 50 000 cycles de paramètres : variation native 208 octets
+--- PASS: TestNativeCStringLifetime (1.18s)
+PASS
+ok  	github.com/milvi/mlpack-go	2.270s

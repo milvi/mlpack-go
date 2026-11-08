@@ -2,83 +2,86 @@ package mlpack
 
 /*
 #cgo CFLAGS: -I./capi
-#cgo LDFLAGS: -L. -lmlpack_go_gmm_probability
 #include <capi/gmm_probability.h>
 #include <stdlib.h>
 */
-import "C" 
+import "C"
 
-import "gonum.org/v1/gonum/mat" 
+import "gonum.org/v1/gonum/mat"
+import native "github.com/milvi/mlpack"
 
 type GmmProbabilityOptionalParam struct {
-    Verbose bool
+	Verbose bool
 }
 
 func GmmProbabilityOptions() *GmmProbabilityOptionalParam {
-  return &GmmProbabilityOptionalParam{
-    Verbose: false,
-  }
+	return &GmmProbabilityOptionalParam{
+		Verbose: false,
+	}
 }
 
 /*
-  This program calculates the probability that given points came from a given
-  GMM (that is, P(X | gmm)).  The GMM is specified with the "InputModel"
-  parameter, and the points are specified with the "Input" parameter.  The
-  output probabilities may be saved via the "Output" output parameter.
+This program calculates the probability that given points came from a given
+GMM (that is, P(X | gmm)).  The GMM is specified with the "InputModel"
+parameter, and the points are specified with the "Input" parameter.  The
+output probabilities may be saved via the "Output" output parameter.
 
-  So, for example, to calculate the probabilities of each point in points coming
-  from the pre-trained GMM gmm, while storing those probabilities in probs, the
-  following command could be used:
-  
-  // Initialize optional parameters for GmmProbability().
-  param := mlpack.GmmProbabilityOptions()
-  
-  probs := mlpack.GmmProbability(&gmm, points, param)
+So, for example, to calculate the probabilities of each point in points coming
+from the pre-trained GMM gmm, while storing those probabilities in probs, the
+following command could be used:
 
-  Input parameters:
+// Initialize optional parameters for GmmProbability().
+param := mlpack.GmmProbabilityOptions()
 
-   - input (mat.Dense): Input matrix to calculate probabilities of.
-   - inputModel (gmm): Input GMM to use as model.
-   - Verbose (bool): Display informational messages and the full list of
-        parameters and timers at the end of execution.
+probs := mlpack.GmmProbability(&gmm, points, param)
 
-  Output parameters:
+Input parameters:
 
-   - output (mat.Dense): Matrix to store calculated probabilities in.
+  - input (mat.Dense): Input matrix to calculate probabilities of.
+  - inputModel (gmm): Input GMM to use as model.
+  - Verbose (bool): Display informational messages and the full list of
+    parameters and timers at the end of execution.
 
- */
-func GmmProbability(input *mat.Dense, inputModel *gmm, param *GmmProbabilityOptionalParam) (*mat.Dense) {
-  params := getParams("gmm_probability")
-  defer cleanParams(params)
-  timers := getTimers()
-  defer cleanTimers(timers)
+Output parameters:
 
-  disableBacktrace()
-  disableVerbose()
-  // Detect if the parameter was passed; set if so.
-  gonumToArmaMat(params, "input", input, false)
-  setPassed(params, "input")
+  - output (mat.Dense): Matrix to store calculated probabilities in.
+*/
+func GmmProbability(input *mat.Dense, inputModel *gmm, param *GmmProbabilityOptionalParam) *mat.Dense {
+	unlock := native.Acquire()
+	defer unlock()
+	params := getParams("gmm_probability")
+	defer cleanParams(params)
+	timers := getTimers()
+	defer cleanTimers(timers)
 
-  // Detect if the parameter was passed; set if so.
-  setGMM(params, "input_model", inputModel)
-  setPassed(params, "input_model")
+	disableBacktrace()
+	disableVerbose()
+	// Detect if the parameter was passed; set if so.
+	gonumToArmaMat(params, "input", input, false)
+	setPassed(params, "input")
 
-  // Detect if the parameter was passed; set if so.
-  if param.Verbose != false {
-    setParamBool(params, "verbose", param.Verbose)
-    setPassed(params, "verbose")
-    enableVerbose()
-  }
+	// Detect if the parameter was passed; set if so.
+	setGMM(params, "input_model", inputModel)
+	setPassed(params, "input_model")
 
-  // Mark all output options as passed.
-  setPassed(params, "output")
+	// Detect if the parameter was passed; set if so.
+	if param.Verbose != false {
+		setParamBool(params, "verbose", param.Verbose)
+		setPassed(params, "verbose")
+		enableVerbose()
+	}
 
-  // Call the mlpack program.
-  C.mlpackGmmProbability(params.mem, timers.mem)
+	// Mark all output options as passed.
+	setPassed(params, "output")
 
-  // Initialize result variable and get output.
-  var outputPtr mlpackArma
-  output := outputPtr.armaToGonumMat(params, "output")
-  // Return output(s).
-  return output
+	// Call the mlpack program.
+	C.mlpackGmmProbability(params.mem, timers.mem)
+	checkNative()
+
+	// Initialize result variable and get output.
+	var outputPtr mlpackArma
+	output := outputPtr.armaToGonumMat(params, "output")
+	// Return output(s).
+	params.complete = true
+	return output
 }

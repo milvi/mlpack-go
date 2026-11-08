@@ -2,82 +2,85 @@ package mlpack
 
 /*
 #cgo CFLAGS: -I./capi
-#cgo LDFLAGS: -L. -lmlpack_go_hmm_loglik
 #include <capi/hmm_loglik.h>
 #include <stdlib.h>
 */
-import "C" 
+import "C"
 
-import "gonum.org/v1/gonum/mat" 
+import "gonum.org/v1/gonum/mat"
+import native "github.com/milvi/mlpack"
 
 type HmmLoglikOptionalParam struct {
-    Verbose bool
+	Verbose bool
 }
 
 func HmmLoglikOptions() *HmmLoglikOptionalParam {
-  return &HmmLoglikOptionalParam{
-    Verbose: false,
-  }
+	return &HmmLoglikOptionalParam{
+		Verbose: false,
+	}
 }
 
 /*
-  This utility takes an already-trained HMM, specified with the "InputModel"
-  parameter, and evaluates the log-likelihood of a sequence of observations,
-  given with the "Input" parameter.  The computed log-likelihood is given as
-  output.
+This utility takes an already-trained HMM, specified with the "InputModel"
+parameter, and evaluates the log-likelihood of a sequence of observations,
+given with the "Input" parameter.  The computed log-likelihood is given as
+output.
 
-  For example, to compute the log-likelihood of the sequence seq with the
-  pre-trained HMM hmm, the following command may be used: 
-  
-  // Initialize optional parameters for HmmLoglik().
-  param := mlpack.HmmLoglikOptions()
-  
-  _ := mlpack.HmmLoglik(seq, &hmm, param)
+For example, to compute the log-likelihood of the sequence seq with the
+pre-trained HMM hmm, the following command may be used:
 
-  Input parameters:
+// Initialize optional parameters for HmmLoglik().
+param := mlpack.HmmLoglikOptions()
 
-   - input (mat.Dense): File containing observations,
-   - inputModel (hmmModel): File containing HMM.
-   - Verbose (bool): Display informational messages and the full list of
-        parameters and timers at the end of execution.
+_ := mlpack.HmmLoglik(seq, &hmm, param)
 
-  Output parameters:
+Input parameters:
 
-   - logLikelihood (float64): Log-likelihood of the sequence.  Default
-        value 0.
+  - input (mat.Dense): File containing observations,
+  - inputModel (hmmModel): File containing HMM.
+  - Verbose (bool): Display informational messages and the full list of
+    parameters and timers at the end of execution.
 
- */
-func HmmLoglik(input *mat.Dense, inputModel *hmmModel, param *HmmLoglikOptionalParam) (float64) {
-  params := getParams("hmm_loglik")
-  defer cleanParams(params)
-  timers := getTimers()
-  defer cleanTimers(timers)
+Output parameters:
 
-  disableBacktrace()
-  disableVerbose()
-  // Detect if the parameter was passed; set if so.
-  gonumToArmaMat(params, "input", input, false)
-  setPassed(params, "input")
+  - logLikelihood (float64): Log-likelihood of the sequence.  Default
+    value 0.
+*/
+func HmmLoglik(input *mat.Dense, inputModel *hmmModel, param *HmmLoglikOptionalParam) float64 {
+	unlock := native.Acquire()
+	defer unlock()
+	params := getParams("hmm_loglik")
+	defer cleanParams(params)
+	timers := getTimers()
+	defer cleanTimers(timers)
 
-  // Detect if the parameter was passed; set if so.
-  setHMMModel(params, "input_model", inputModel)
-  setPassed(params, "input_model")
+	disableBacktrace()
+	disableVerbose()
+	// Detect if the parameter was passed; set if so.
+	gonumToArmaMat(params, "input", input, false)
+	setPassed(params, "input")
 
-  // Detect if the parameter was passed; set if so.
-  if param.Verbose != false {
-    setParamBool(params, "verbose", param.Verbose)
-    setPassed(params, "verbose")
-    enableVerbose()
-  }
+	// Detect if the parameter was passed; set if so.
+	setHMMModel(params, "input_model", inputModel)
+	setPassed(params, "input_model")
 
-  // Mark all output options as passed.
-  setPassed(params, "log_likelihood")
+	// Detect if the parameter was passed; set if so.
+	if param.Verbose != false {
+		setParamBool(params, "verbose", param.Verbose)
+		setPassed(params, "verbose")
+		enableVerbose()
+	}
 
-  // Call the mlpack program.
-  C.mlpackHmmLoglik(params.mem, timers.mem)
+	// Mark all output options as passed.
+	setPassed(params, "log_likelihood")
 
-  // Initialize result variable and get output.
-  logLikelihood := getParamDouble(params, "log_likelihood")
-  // Return output(s).
-  return logLikelihood
+	// Call the mlpack program.
+	C.mlpackHmmLoglik(params.mem, timers.mem)
+	checkNative()
+
+	// Initialize result variable and get output.
+	logLikelihood := getParamDouble(params, "log_likelihood")
+	// Return output(s).
+	params.complete = true
+	return logLikelihood
 }

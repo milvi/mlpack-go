@@ -1,6 +1,7 @@
-name: Ubuntu 26.04 et mémoire native
+name: Ubuntu 26.04 — intégration Go
 on:
   push:
+    branches: [master, 'codex/**']
   pull_request:
   workflow_dispatch:
 permissions:
@@ -14,7 +15,33 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Construire et vérifier dans Ubuntu 26.04
-        run: docker build --progress=plain --build-arg JOBS=2 -t mlpack-go-verification .
-      - name: Exécuter k-means
+      - name: Construire, vérifier les sommes et les pointeurs dans Ubuntu 26.04
+        run: docker build --progress=plain -t mlpack-go-verification .
+      - name: Exécuter k-means sur un processus neuf
         run: docker run --rm mlpack-go-verification
+      - name: Mesurer temps et mémoire sur trois graines
+        run: >-
+          docker run --rm --entrypoint python3 mlpack-go-verification
+          tools/benchmark.py --binary /home/mlpack/kmeans --output /tmp/mesures.json
+
+  publication:
+    needs: integration
+    if: github.event_name == 'push' && github.ref == 'refs/heads/codex/publication-v0.1.0'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Publier le tag immuable après validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=v0.1.0
+          if git show-ref --verify --quiet "refs/tags/$version"; then
+            test "$(git rev-parse "$version^{commit}")" = "$GITHUB_SHA"
+          else
+            git tag "$version" "$GITHUB_SHA"
+            git push origin "refs/tags/$version"
+          fi

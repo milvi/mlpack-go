@@ -1,16 +1,20 @@
 FROM ubuntu:26.04
+ARG GO_VERSION=1.27.3
+ARG GO_SHA256=65efbc80fdc1fa2cd2631cad5b481777a68e8725f34e89f50fc6ac714e379b40
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-      build-essential cmake pkg-config curl ca-certificates patch \
-      libarmadillo-dev libensmallen-dev libcereal-dev && \
+    build-essential libarmadillo-dev libensmallen-dev libcereal-dev ca-certificates curl python3 && \
     rm -rf /var/lib/apt/lists/*
+RUN curl -fsSL "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" -o /tmp/go.tgz && \
+    echo "${GO_SHA256}  /tmp/go.tgz" | sha256sum -c - && \
+    tar -C /usr/local -xzf /tmp/go.tgz && rm /tmp/go.tgz
+ENV PATH=/usr/local/go/bin:$PATH GOMAXPROCS=2 GOFLAGS=-p=2
 RUN useradd --create-home --shell /bin/bash mlpack
-COPY --chown=mlpack:mlpack . /home/mlpack/projet/
+COPY --chown=mlpack:mlpack . /home/mlpack/projet
 USER mlpack
 WORKDIR /home/mlpack/projet
-ARG JOBS=2
-ENV JOBS=${JOBS}
-RUN bash installer.sh
-RUN bash -c '. "$HOME/.local/opt/mlpack-go-milvi/4.8.0-go1.27.3/env.sh"; go test -buildvcs=false ./...'
-RUN bash -c '. "$HOME/.local/opt/mlpack-go-milvi/4.8.0-go1.27.3/env.sh"; GOEXPERIMENT=cgocheck2 go test -buildvcs=false ./...'
-RUN bash -c '. "$HOME/.local/opt/mlpack-go-milvi/4.8.0-go1.27.3/env.sh"; GOMAXPROCS=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 go test -buildvcs=false -tags mlpack_memtest -run TestNative -v .'
-CMD ["/home/mlpack/.local/opt/mlpack-go-milvi/4.8.0-go1.27.3/bin/kmeans-demo"]
+RUN go version && g++ --version && dpkg-query -W libarmadillo-dev libensmallen-dev libcereal-dev
+RUN go mod download && go mod verify && go test -v ./...
+RUN GOEXPERIMENT=cgocheck2 go test ./...
+RUN go test -tags mlpack_memtest -run TestNative -v .
+RUN go build -o /home/mlpack/kmeans ./cmd/kmeans && go run ./examples/kmeans
+CMD ["/home/mlpack/kmeans", "-n", "100000", "-k", "1000"]

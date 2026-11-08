@@ -1,16 +1,17 @@
 {
-  "date": "2026-11-02",
-  "statut": "validation locale via racine Ubuntu 26.04 et fakechroot",
-  "bibliotheques_natives": 47,
-  "fichiers_installes_par_cmake": 1196,
-  "prefixe_octets_fichiers": 296078674,
-  "bibliotheques_natives_octets": 37517624,
-  "reprise_objets_cxx_recompiles": 0,
-  "sha256_journaux": {
-    "audit/installation-fork.log": "f57b0f5c5261422f25ad4d631aa8eaee3d475bb800d7fd430c89e0b93bb2027e",
-    "audit/reprise-fork.log": "b3fcfca3b6cbef67f1ca323bac06dc3bb00c0c06a4bf17fd0f9b32261f10e8e2",
-    "audit/generation-test.log": "15e418e044e38f09ef8298e82f95e6ae5e9b2d024add7345d1866f4c0d7cde9c",
-    "audit/tests-fork.log": "14041ad2897a5dd756d9cde8b31d67f67c425bfba7ffff194dfe471c0a435160",
-    "audit/tests-cgocheck2.log": "65b086a5a76bc261391648b44c865421326a172cf9a309f5007bd4635a93f929"
-  }
+  "date": "2026-11-08",
+  "cpp_commit": "cb3d9db1842f20904d24cc01b71dae2ce9f21ded",
+  "mlpack_amont": "4.8.0",
+  "go": "1.27.3",
+  "gonum": "v0.17.0",
+  "plateforme": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "distribution": "PRETTY_NAME=\"Debian GNU/Linux 13 (trixie)\"\nNAME=\"Debian GNU/Linux\"\nVERSION_ID=\"13\"\nVERSION=\"13 (trixie)\"\nVERSION_CODENAME=trixie\nDEBIAN_VERSION_FULL=13.6\nID=debian\nHOME_URL=\"https://www.debian.org/\"\nSUPPORT_URL=\"https://www.debian.org/support\"\nBUG_REPORT_URL=\"https://bugs.debian.org/\"\n",
+  "compilateur_cpp": "g++ (Debian 14.2.0-19) 14.2.0",
+  "apt_sysroot": {
+    "libarmadillo": "14.2.3+dfsg-1+b1",
+    "libensmallen": "2.22.1-2",
+    "libcereal": "1.3.2+dfsg-5"
+  },
+  "installation_laboratoire": "Paquets APT extraits dans un sysroot ; aucun changement des paquets de la machine hôte. Les variables CGO temporaires concernent seulement ce laboratoire.",
+  "asan_local": "ASan et UBSan actifs ; detect_leaks=0 à cause de la restriction ptrace. LSan fait partie de la validation Docker Ubuntu."
 }

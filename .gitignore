@@ -1,3 +1,4 @@
 *.so
 *.so.*
-/installation-mlpack.log
+/kmeans-mesure
+/kmeans
