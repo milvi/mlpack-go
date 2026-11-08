@@ -1,0 +1,46 @@
+{
+  "n": 100000,
+  "k": 1000,
+  "seed": 42,
+  "iteration_limit": 100,
+  "fields_compared": [
+    "k_actual",
+    "iterations",
+    "converged",
+    "inertia",
+    "distance_calculations"
+  ],
+  "identical": true,
+  "previous": {
+    "n": 100000,
+    "k_requested": 1000,
+    "k_actual": 1000,
+    "seed": 42,
+    "algorithm": "dualtree",
+    "threads": 1,
+    "iteration_limit": 100,
+    "iterations": 100,
+    "converged": false,
+    "seconds": 1.75866101,
+    "peak_rss_bytes": 31592448,
+    "go_heap_alloc_bytes": 2683248,
+    "inertia": 15.992719174506774,
+    "distance_calculations": 23483541
+  },
+  "current": {
+    "n": 100000,
+    "k_requested": 1000,
+    "k_actual": 1000,
+    "seed": 42,
+    "algorithm": "dualtree",
+    "threads": 1,
+    "iteration_limit": 100,
+    "iterations": 100,
+    "converged": false,
+    "seconds": 1.6391606699999999,
+    "peak_rss_bytes": 21909504,
+    "go_heap_alloc_bytes": 2518712,
+    "inertia": 15.992719174506774,
+    "distance_calculations": 23483541
+  }
+}

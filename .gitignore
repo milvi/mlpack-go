@@ -1,4 +1,4 @@
-*.so
-*.so.*
-/kmeans-mesure
 /kmeans
+/kmeans-exemple
+*.pyc
+__pycache__/

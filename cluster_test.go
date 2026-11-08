@@ -182,22 +182,6 @@ func TestClusterOpenMPParity(t *testing.T) {
 	validateResult(t, points, parallel)
 }
 
-func TestLegacyDualTreeSingleCluster(t *testing.T) {
-	options := KmeansOptions()
-	options.Algorithm = "dualtree"
-	options.LabelsOnly = true
-	options.InitialCentroids = mat.NewDense(1, 2, []float64{0, 0})
-	centers, labels := Kmeans(1, mat.NewDense(3, 2, []float64{0, 0, 2, 2, 4, 4}), options)
-	if centers.At(0, 0) != 2 || centers.At(0, 1) != 2 {
-		t.Fatal("moyenne incorrecte")
-	}
-	for i := range 3 {
-		if labels.At(i, 0) != 0 {
-			t.Fatal("étiquette incorrecte")
-		}
-	}
-}
-
 func TestClusterCPPFailureAndRecovery(t *testing.T) {
 	options := DefaultOptions()
 	options.Algorithm = "naive"

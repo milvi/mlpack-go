@@ -1,4 +1,4 @@
-github.com/milvi/mlpack v0.1.0 h1:4sYlXdxm6mCMxoqurt/d1AaPqo7vxIKiuMH//z8Gois=
-github.com/milvi/mlpack v0.1.0/go.mod h1:DBnIehVsMhYoy/PCm2WaZn2syMbvJd+CvmzM5ATVNH4=
+github.com/milvi/mlpack v0.2.0-kmeans.1 h1:x+vFboNb0RqkOWuYSgeRBK4duZPHVTZa8fX3y912LHA=
+github.com/milvi/mlpack v0.2.0-kmeans.1/go.mod h1:DBnIehVsMhYoy/PCm2WaZn2syMbvJd+CvmzM5ATVNH4=
 gonum.org/v1/gonum v0.17.0 h1:VbpOemQlsSMrYmn7T2OUvQ4dqxQXU+ouZFQsZOx50z4=
 gonum.org/v1/gonum v0.17.0/go.mod h1:El3tOrEuMpv2UdMrbNlKEh9vd86bmQ6vqIcDwxEOc1E=

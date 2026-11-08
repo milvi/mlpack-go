@@ -23,7 +23,7 @@ for n, k in [(100000, 1000), (1000000, 1000), (1000000, 10000)]:
     for trial in range(args.trials):
         command = [str(Path(args.binary).resolve()), '-n', str(n), '-k', str(k),
                    '-seed', str(42 + trial), '-threads', '1', '-iterations', str(args.iterations)]
-        completed = subprocess.run(command, check=True, text=True, capture_output=True)
+        completed = subprocess.run(command, check=True, text=True, capture_output=True, timeout=120)
         value = json.loads(completed.stdout)
         measurements.append(value)
         print(json.dumps(value, ensure_ascii=False), flush=True)

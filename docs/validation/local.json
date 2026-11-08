@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-08",
+  "branche": "codex/kmeans-only",
+  "version": "v0.2.0-kmeans.1",
+  "cpp_commit": "fa1b738da2211f05215e7668c56877b20190d939",
+  "go": "1.27.3",
+  "gcc": "14.2.0",
+  "armadillo": "14.2.3",
+  "distribution": "Debian 13.6 amd64",
+  "paquets": "Paquets APT extraits dans un sysroot ; aucun paquet installé sur le système hôte.",
+  "validation_locale": "Deux modules dans un workspace Go ; validation du module téléchargé et d’Ubuntu effectuée séparément.",
+  "cpp_headers": 55,
+  "cpp_source_bytes": 349333,
+  "cpp_compilation_units_before": 49,
+  "cpp_compilation_units_after": 1,
+  "binary_bytes_before": 25997776,
+  "binary_bytes_after": 4129464,
+  "native_allocation_failures_intercepted": 390,
+  "tree_allocation_failures_intercepted": 639,
+  "live_cpp_allocations_after_each_case": "Retour exact au niveau initial",
+  "local_lsan": "Indisponible : restriction ptrace ; ASan et UBSan exécutés avec detect_leaks=0. LSan est exécuté dans le conteneur Ubuntu.",
+  "test_timeout_seconds": 120,
+  "source_sha256": {
+    "cluster.go": "a87b591f43e7481ee3c7761737040a9b6a97ba7fe49ee2fc0006ee68332f1c0b",
+    "cluster_test.go": "22079da7eddd69c50c1ec8ce69d479cbe3224ee8a213e62369f20f6cb2ad3554",
+    "cluster_memory_test.go": "00eb91cc87e5aac0cd6e058d90c4a73bd5d374406f5e54166c5d51d21dd05b84",
+    "memory_linux.go": "018a688df8f57eff0587cd4f57d18b4aae96d2618259265aca490fd55e8021d6"
+  }
+}

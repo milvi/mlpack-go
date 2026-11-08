@@ -20,7 +20,7 @@ with tempfile.TemporaryDirectory(prefix='mlpack-cache-') as tmp:
     def build(name):
         start = time.monotonic()
         value = subprocess.run(['go', 'build', '-p', '2', '-x', '-o', str(Path(tmp)/'kmeans'), './cmd/kmeans'],
-            cwd=root, capture_output=True, text=True)
+            cwd=root, capture_output=True, text=True, timeout=120)
         if value.returncode:
             raise RuntimeError(value.stderr[-12000:])
         units = re.findall(r' -c (?:\S*/)?(native_[^\s]+\.cpp)(?:\s|$)', value.stderr)
@@ -38,15 +38,15 @@ with tempfile.TemporaryDirectory(prefix='mlpack-cache-') as tmp:
         header.write_bytes(original)
     build('source restaurée')
     binary = (Path(tmp)/'kmeans').read_bytes()
-    marker = 'Les matrices restent dans std::any ; seuls les modèles pointés sont concernés.'.encode()
-    native_header = Path(a.native).resolve()/'src/mlpack/bindings/go/model_memory.hpp'
+    marker = b'@file methods/kmeans/dual_tree_kmeans.hpp'
+    native_header = header
     if marker not in native_header.read_bytes():
         raise AssertionError('témoin source absent du test')
     if marker in binary:
         raise AssertionError('les sources C++ embarquées sont présentes dans le binaire')
     if (results[1]['native_compilations'] != 0 or
             results[2]['native_compilations'] != 0 or
-            results[3]['native_compilations'] != 49 or
+            results[3]['native_compilations'] != 1 or
             results[4]['native_compilations'] != 0):
         raise AssertionError(f'cache inattendu : {results}')
     report = dict(builds=results, source_marker_in_binary=False, binary_bytes=len(binary),

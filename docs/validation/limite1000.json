@@ -1,1 +1,0 @@
-{"n":1000000,"k_requested":1000,"k_actual":1000,"seed":42,"algorithm":"dualtree","threads":1,"iteration_limit":1000,"iterations":1000,"converged":false,"seconds":73.369456689,"peak_rss_bytes":177508352,"go_heap_alloc_bytes":24146920,"inertia":162.81306358936354,"distance_calculations":539660032}
