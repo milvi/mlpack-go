@@ -99,8 +99,6 @@ flowchart TD
     A -->|bibliothèques dynamiques| E
 ```
 
-Le même schéma est proposé dans [quiver](docs/installation-quiver.md).
-
 | Emplacement habituel | Contenu | Qui écrit ? |
 |---|---|---|
 | `/usr/bin`, `/usr/include`, `/usr/lib` | GCC/G++, make, Armadillo, ensmallen, cereal et dépendances BLAS/LAPACK, etc. | APT/dpkg |

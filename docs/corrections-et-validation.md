@@ -5,10 +5,11 @@ Le module utilisateur est `github.com/milvi/mlpack-go@v0.1.0` ; il dépend de
 [`cb3d9db1842f20904d24cc01b71dae2ce9f21ded`](https://github.com/milvi/mlpack/commit/cb3d9db1842f20904d24cc01b71dae2ce9f21ded).
 Les versions de module suivent les règles Go ; elles sont distinctes de la version amont C++.
 
-L’installation utilise APT puis `go get` et `go build`. Le script d’installation,
-le patch de déploiement et le SDK Go privé sont retirés. Les changements C++ sont
-committés dans leur fork ; aucun patch n’est appliqué sur la machine qui compile.
-Les anciennes mesures restent dans [l’historique](corrections-historiques-2026-11-02.md).
+L’installation utilise APT puis `go get` et `go build`, qui compile automatiquement
+le code natif. Les changements C++ sont committés dans leur fork et distribués
+par le module natif versionné. Le [README](../README.md) décrit l’installation
+et les emplacements utilisés ; ce rapport documente les corrections présentes
+dans le source et leurs validations.
 
 ## Corrections effectives
 
@@ -28,6 +29,37 @@ Les anciennes mesures restent dans [l’historique](corrections-historiques-2026
 | Exceptions traversant la frontière C | Interception des exceptions aux entrées C, tampon d’erreur borné. `Cluster` rend `error` ; signatures historiques conservées avec `panic(error)`. |
 | Vérifications d’un autre algorithme dans les fonctions inline communes | Elles utilisent désormais les paramètres de l’appel. Les journaux sont partagés dans le module monolithique. |
 | En-têtes C++ imbriqués ignorés par le cache cgo | Entrées explicites `go:embed`, sans conservation du système de fichiers dans l’exécutable ; essai de modification d’en-tête exécuté. |
+
+### Conversions et nettoyage dans le source
+
+Une matrice Gonum contient un point par ligne. Les conversions communes inversent
+les dimensions pour présenter un point par colonne à Armadillo, sans transposer
+chaque valeur. Une vue dont le pas `Stride` dépasse sa largeur est compactée
+ligne par ligne. Les matrices d’entrée absentes ou vides sont refusées avant
+d’accéder au premier élément ; les dimensions des sorties sont contrôlées avant
+l’allocation Go.
+
+Les sorties sont allouées en Go et remplies par `mlpackCopyParamMat` ou
+`mlpackCopyParamVectorInt`. Elles restent utilisables après destruction des
+paramètres natifs et passage du ramasse-miettes. Le stockage C++ reste possédé
+par ses objets : aucune slice Go ne reprend un tampon natif sans propriétaire.
+Chaque wrapper programme le nettoyage des paramètres et des chronomètres dès
+leur création, ainsi que la libération des chaînes C temporaires dans leur portée.
+
+| Élément maintenu | Implémentation | Contrôles présents |
+|---|---|---|
+| Matrices, vues et copie des sorties | [arma_util.go](../arma_util.go) | [arma_util_test.go](../arma_util_test.go) : vues, sorties indépendantes, conversions réelles et entières, données catégorielles |
+| Paramètres, chronomètres, chaînes et vecteurs | [io_util.go](../io_util.go) | [arma_util_test.go](../arma_util_test.go) : vecteurs vides et non vides, chaînes UTF-8 ; [memory_linux_test.go](../memory_linux_test.go) : restitutions répétées |
+| Propriétaire partagé des modèles | [model_owner.go](../model_owner.go) | [model_owner_test.go](../model_owner_test.go) : alias, fermeture, erreurs et propriété des données d’entraînement |
+| Génération des wrappers Go et accesseurs de modèles | [print_go.cpp](https://github.com/milvi/mlpack/blob/v0.1.0/src/mlpack/bindings/go/print_go.cpp), [AppendModel.cmake](https://github.com/milvi/mlpack/blob/v0.1.0/CMake/go/AppendModel.cmake) | Nettoyages et propriété conservés lors de la génération ; procédure dans [rel/deployment.md](../rel/deployment.md) |
+
+Les wrappers C++ générés par
+[`tools/generate-native.py`](https://github.com/milvi/mlpack/blob/v0.1.0/tools/generate-native.py)
+sont committés dans le module natif. Le consommateur n’exécute aucun générateur.
+Les détails des conversions natives et de leur propriété sont dans le
+[guide mémoire C++](https://github.com/milvi/mlpack/blob/v0.1.0/doc/developer/bindings/go_memory.md).
+
+### Appel k-means
 
 `Cluster` fait un seul appel de calcul natif. Le C++ copie les entrées, construit
 ses objets, écrit dans les slices Go et détruit ses ressources avant de revenir.
