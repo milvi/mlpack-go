@@ -1,0 +1,59 @@
+=== RUN   TestMatrixOutputOwnsItsData
+--- PASS: TestMatrixOutputOwnsItsData (0.00s)
+=== RUN   TestStridedMatrixInput
+--- PASS: TestStridedMatrixInput (0.00s)
+=== RUN   TestCommonConversions
+=== RUN   TestCommonConversions/mat
+=== RUN   TestCommonConversions/umat
+=== RUN   TestCommonConversions/row
+=== RUN   TestCommonConversions/urow
+=== RUN   TestCommonConversions/col
+--- PASS: TestCommonConversions (0.00s)
+    --- PASS: TestCommonConversions/mat (0.00s)
+    --- PASS: TestCommonConversions/umat (0.00s)
+    --- PASS: TestCommonConversions/row (0.00s)
+    --- PASS: TestCommonConversions/urow (0.00s)
+    --- PASS: TestCommonConversions/col (0.00s)
+=== RUN   TestCategoricalMatrixCopy
+--- PASS: TestCategoricalMatrixCopy (0.00s)
+=== RUN   TestVectorOutputs
+--- PASS: TestVectorOutputs (0.00s)
+=== RUN   TestKmeansReturnsIndependentLabels
+=== RUN   TestKmeansReturnsIndependentLabels/naive
+=== RUN   TestKmeansReturnsIndependentLabels/dualtree
+--- PASS: TestKmeansReturnsIndependentLabels (0.02s)
+    --- PASS: TestKmeansReturnsIndependentLabels/naive (0.01s)
+    --- PASS: TestKmeansReturnsIndependentLabels/dualtree (0.01s)
+=== RUN   TestClusterMatchesNaive
+--- PASS: TestClusterMatchesNaive (0.04s)
+=== RUN   TestClusterOwnershipAndDegeneracies
+--- PASS: TestClusterOwnershipAndDegeneracies (0.00s)
+=== RUN   TestClusterErrors
+--- PASS: TestClusterErrors (0.00s)
+=== RUN   TestClusterConcurrency
+--- PASS: TestClusterConcurrency (0.00s)
+=== RUN   TestClusterDenseStride
+--- PASS: TestClusterDenseStride (0.00s)
+=== RUN   TestClusterOpenMPParity
+--- PASS: TestClusterOpenMPParity (0.04s)
+=== RUN   TestLegacyDualTreeSingleCluster
+--- PASS: TestLegacyDualTreeSingleCluster (0.00s)
+=== RUN   TestClusterCPPFailureAndRecovery
+--- PASS: TestClusterCPPFailureAndRecovery (0.00s)
+=== RUN   TestModelCloseAndBorrowedAlias
+--- PASS: TestModelCloseAndBorrowedAlias (0.00s)
+=== RUN   TestLegacyCPPExceptionBecomesGoPanic
+[0;31m[FATAL] [0mInvalid value of "Algorithm" specified ("algorithme-invalide"); unknown k-means algorithm; must be one of "elkan", "hamerly", "pelleg-moore", "dualtree", "dualtree-covertree", or "naive"!
+
+--- PASS: TestLegacyCPPExceptionBecomesGoPanic (0.00s)
+=== RUN   TestBorrowedModelSurvivesCPPError
+[0;31m[FATAL] [0mThe number of rows in the exact distances matrix (2 must be equal to k (1).
+
+--- PASS: TestBorrowedModelSurvivesCPPError (0.00s)
+=== RUN   TestModelOwnsTrainingData
+--- PASS: TestModelOwnsTrainingData (0.00s)
+PASS
+ok  	github.com/milvi/mlpack-go	0.107s
+?   	github.com/milvi/mlpack-go/cmd/diagnostic-memoire	[no test files]
+?   	github.com/milvi/mlpack-go/cmd/kmeans	[no test files]
+?   	github.com/milvi/mlpack-go/examples/kmeans	[no test files]

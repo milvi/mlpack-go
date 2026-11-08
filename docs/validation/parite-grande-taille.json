@@ -1,0 +1,82 @@
+[
+  {
+    "n": 10000,
+    "k": 100,
+    "iteration_limit": 1000,
+    "measurements": [
+      {
+        "n": 10000,
+        "k_requested": 100,
+        "k_actual": 100,
+        "seed": 42,
+        "algorithm": "dualtree",
+        "threads": 1,
+        "iteration_limit": 1000,
+        "iterations": 60,
+        "converged": true,
+        "seconds": 0.083066938,
+        "peak_rss_bytes": 15806464,
+        "go_heap_alloc_bytes": 500680,
+        "inertia": 16.213365094045386,
+        "distance_calculations": 1277918
+      },
+      {
+        "n": 10000,
+        "k_requested": 100,
+        "k_actual": 100,
+        "seed": 42,
+        "algorithm": "naive",
+        "threads": 1,
+        "iteration_limit": 1000,
+        "iterations": 59,
+        "converged": true,
+        "seconds": 0.416366952,
+        "peak_rss_bytes": 15400960,
+        "go_heap_alloc_bytes": 500728,
+        "inertia": 16.213365094045397,
+        "distance_calculations": 59183291
+      }
+    ],
+    "inertia_agrees": true
+  },
+  {
+    "n": 1000000,
+    "k": 1000,
+    "iteration_limit": 1,
+    "measurements": [
+      {
+        "n": 1000000,
+        "k_requested": 1000,
+        "k_actual": 1000,
+        "seed": 42,
+        "algorithm": "dualtree",
+        "threads": 1,
+        "iteration_limit": 1,
+        "iterations": 1,
+        "converged": false,
+        "seconds": 0.899021195,
+        "peak_rss_bytes": 177184768,
+        "go_heap_alloc_bytes": 24280152,
+        "inertia": 218.52835322324557,
+        "distance_calculations": 22065471
+      },
+      {
+        "n": 1000000,
+        "k_requested": 1000,
+        "k_actual": 1000,
+        "seed": 42,
+        "algorithm": "naive",
+        "threads": 1,
+        "iteration_limit": 1,
+        "iterations": 1,
+        "converged": false,
+        "seconds": 7.759135676,
+        "peak_rss_bytes": 185126912,
+        "go_heap_alloc_bytes": 24280040,
+        "inertia": 218.52835322324628,
+        "distance_calculations": 1020644319
+      }
+    ],
+    "inertia_agrees": true
+  }
+]

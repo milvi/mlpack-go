@@ -1,0 +1,48 @@
+package main
+
+import (
+	"fmt"
+	mlpack "github.com/milvi/mlpack-go"
+	"math"
+	"math/rand/v2"
+)
+
+func main() {
+	const n, dimensions, k = 10000, 2, 10
+	points := make([]float64, n*dimensions)
+	random := rand.New(rand.NewPCG(42, 17))
+	for i := range points {
+		points[i] = random.Float64()
+	}
+	result, err := mlpack.Cluster(points, dimensions, k, nil)
+	if err != nil {
+		panic(err)
+	}
+	if len(result.Labels) != n || len(result.Centers) != k*dimensions || !result.Converged {
+		panic("résultat incomplet")
+	}
+	for i, label := range result.Labels {
+		if label < 0 || label >= k {
+			panic("étiquette hors limites")
+		}
+		chosen := 0.0
+		for d := range dimensions {
+			diff := points[i*dimensions+d] - result.Centers[label*dimensions+d]
+			chosen += diff * diff
+		}
+		for c := range k {
+			other := 0.0
+			for d := range dimensions {
+				diff := points[i*dimensions+d] - result.Centers[c*dimensions+d]
+				other += diff * diff
+			}
+			if other+1e-10 < chosen {
+				panic("affectation inexacte")
+			}
+		}
+	}
+	if math.IsNaN(result.Inertia) {
+		panic("inertie non finie")
+	}
+	fmt.Printf("OK : n=%d, k=%d, itérations=%d, convergence=%t, inertie=%.9f\n", n, result.Clusters, result.Iterations, result.Converged, result.Inertia)
+}

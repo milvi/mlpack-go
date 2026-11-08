@@ -1,0 +1,10 @@
+{
+  "consumer-build.log": {
+    "native_cpp_compilations": 0
+  },
+  "consumer-second-build.log": {
+    "native_cpp_compilations": 0
+  },
+  "premiere_revision": "5da21922d8da75fa4a64521d975282f227113dc0",
+  "seconde_revision": "219a905d4df7ace21ba8f525313681e277352f46"
+}

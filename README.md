@@ -136,7 +136,7 @@ La compatibilité d’une future version de Gonum doit ensuite être vérifiée.
 
 | Changement | Effet sur le prochain `go build` |
 |---|---|
-| Nouveau commit Git sans changement des entrées de compilation | Pas de reconstruction des paquets pour ce seul motif ; les métadonnées VCS peuvent modifier le lien final |
+| Nouveau commit Git sans changement des entrées de compilation | Les objets des bibliothèques restent réutilisables ; les métadonnées VCS peuvent imposer une nouvelle construction du binaire principal |
 | Source Go, C/C++, déclaration C ou en-tête mlpack modifié | Recompilation du paquet concerné et reconstruction des dépendants nécessaires |
 | En-tête C++ dans un sous-répertoire mlpack | Pris en compte explicitement dans ce module grâce à `go:embed` |
 | Version Go, options de compilation, architecture ou paramètres cgo | Autre clé de cache : les actions concernées sont reconstruites |

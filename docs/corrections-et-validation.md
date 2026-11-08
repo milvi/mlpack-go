@@ -46,6 +46,11 @@ les erreurs C++, l’appel suivant une erreur, la concurrence, OpenMP à deux th
 les alias de modèles et la conservation d’un modèle après modification des
 entrées Go et passage du ramasse-miettes.
 
+Une [comparaison supplémentaire](validation/parite-grande-taille.json) retrouve
+la même inertie à 10⁻⁹ relatif : n = 10 000, k = 100 jusqu’à convergence, puis
+n = 1 000 000, k = 1 000 sur un pas de Lloyd. Le premier cas termine en 60 pas
+dual-tree et 59 pas naïfs ; les inerties finales ne diffèrent qu’à l’arrondi.
+
 Les [mesures de restitution](validation/memoire.log), après échauffement et
 ramasse-miettes Go, donnent :
 
@@ -109,6 +114,50 @@ avec le journal public de vérification ; ces empreintes sont distinctes des cl�
 utilisées par le cache de compilation. Le [module C++ téléchargé](validation/module-cpp-publie.json)
 porte bien le tag v0.1.0 et le commit annoncé.
 
+## Validation Go publiée et projet indépendant
+
+La [validation complète Ubuntu 26.04](https://github.com/milvi/mlpack-go/actions/runs/42461825373)
+a réussi sur le commit Go `850bad7a4266c0095c6e64232025b81a8b12fe04`, puis publié
+le tag `v0.1.0`. Le [journal](validation/ci-go-ubuntu2604.log) confirme les tests
+ordinaires, `GOEXPERIMENT=cgocheck2`, les restitutions, l’exemple et le benchmark.
+Variations natives sur Ubuntu : +8 960 octets pour 50 appels `Cluster`, +8 816
+pour 50 k-means historiques, +17 088 pour 1 000 modèles fermés, +2 400 pour
+100 modèles interrompus avant export et +1 008 pour 50 000 cycles de paramètres.
+
+Un projet Git indépendant a exécuté `go get github.com/milvi/mlpack-go@latest
+gonum.org/v1/gonum@latest`, `go mod verify`, `go build -p 2` et un appel `Cluster`
+sur 10 000 points. Il a sélectionné les deux modules `v0.1.0` et Gonum `v0.17.0`,
+sans `replace` ni workspace Go actif, puis convergé en 29 pas. Les [preuves](validation/projet-externe.log),
+le [go.mod](validation/projet-externe-go.mod.txt), le [go.sum](validation/projet-externe-go.sum.txt)
+et le [programme](validation/projet-externe-main.go.txt) sont fournis.
+Les variables CGO du sysroot local figurent explicitement dans les métadonnées
+du laboratoire ; la construction Ubuntu ci-dessus utilise les chemins APT ordinaires.
+
+Un [commit vide dans ce projet](validation/cache-et-commit.json) a changé les
+métadonnées VCS (*Version Control System*, système de gestion de versions) du
+binaire, avec zéro compilation C++ supplémentaire. Les objets natifs ont été
+réutilisés. Cela distingue concrètement révision Git et entrées du cache.
+
+## Mesures sur Ubuntu 26.04
+
+CPU AMD EPYC 7763, Go 1.27.3, GCC 15.2, Armadillo 15.2.1 et ensmallen 3.11.0.
+Trois graines, un processus neuf par essai, un thread OpenMP et budget de
+100 itérations. Les conventions de mesure et les limites sont détaillées ci-dessous.
+
+| n | k | Temps médian (s) | Pic RSS médian (Mio) |
+|---:|---:|---:|---:|
+| 100000 | 1000 | 1.459 | 33.02 |
+| 1000000 | 1000 | 6.909 | 173.25 |
+| 1000000 | 10000 | 18.798 | 174.32 |
+
+Pour n multiplié par 10 : à k = 1 000 fixé, temps ×4.74
+et mémoire ×5.25 ; avec k = n/100, temps
+×12.89 et mémoire ×5.28.
+Un seul essai converge avant le budget de 100 pas (n = 100 000, graine 44,
+95 pas) ; les autres atteignent ce budget. Il s’agit d’une comparaison de coût
+à budget fixé, pas de temps garantis jusqu’à convergence.
+[JSON Ubuntu complet](validation/mesures-ubuntu2604.json).
+
 ## Temps et mémoire : points uniformes dans le carré unité
 
 Mesure locale sur AMD EPYC 9V74, Go 1.27.3, GCC 14.2, Armadillo 14.2.3,
@@ -136,7 +185,7 @@ Pour n multiplié par 10 :
 Ces quotients sont empiriques. Le second modifie aussi k ; aucun des deux ne
 prouve une complexité asymptotique. Le nombre d’itérations I et les couples de
 nœuds visités dépendent des données et de l’initialisation. Un parcours dual-tree
-peut perdre son avantage de pruning ; une garantie globale O(n log n) ne découle
+peut perdre son avantage d’élagage ; une garantie globale O(n log n) ne découle
 pas de ces mesures. La mémoire observée est compatible avec un coût linéaire,
 plus une partie fixe, sur ces deux tailles ; deux tailles ne prouvent pas une borne.
 
