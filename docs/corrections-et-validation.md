@@ -1,151 +1,72 @@
-# Réduction à k-means et validation du 8 novembre 2026
+# Budget temporel de k-means — 9 novembre 2026
 
-Branche `codex/kmeans-only` des deux dépôts ; préversion `v0.2.0-kmeans.1`.
-Le module C++ désigne le commit
-[`fa1b738da2211f05215e7668c56877b20190d939`](https://github.com/milvi/mlpack/commit/fa1b738da2211f05215e7668c56877b20190d939).
-Les sources conservées dérivent de mlpack C++ 4.8.0.
+La préversion `v0.2.0-kmeans.2` de la branche `codex/kmeans-only` remplace le
+plafond d’itérations par `Options.MaxDuration`, de type `time.Duration`.
+La valeur par défaut et la valeur zéro choisissent **20 secondes** ; une durée
+négative est refusée. La commande utilise `-max-duration 20s`.
+`MaxIterations` et le drapeau `-iterations` sont retirés. `Result.Iterations`
+compte uniquement les itérations terminées et ne constitue plus un critère d’arrêt.
 
-## Périmètre du source
+## Contrat d’expiration
 
-| Élément | Avant | Sur cette branche |
-|---|---|---|
-| Unités C++ compilées | 49 | 1 : `native_kmeans_api.cpp` |
-| Méthodes exposées | Ensemble des bindings mlpack | K-means : `Cluster`, adaptateur `ClusterDense` |
-| En-têtes internes conservés | Ensemble de mlpack | 55 fichiers, 349 333 octets |
-| Dépendances C++ de développement | Armadillo, ensmallen, cereal | Armadillo |
-| Exécutable de mesure local | 25 997 776 octets | 4 129 464 octets |
+Le budget couvre la préparation des données dans l’API Go, l’attente du verrou
+natif et le calcul C++, y compris construction des arbres et affectation finale.
+Pour `ClusterDense`, la copie éventuelle d’une vue Gonum fait partie du budget.
+La génération aléatoire des points par le CLI et la compilation par `go run`
+sont extérieures au calcul chronométré.
 
-Les autres méthodes, autres langages, modèles persistants, générateurs et
-infrastructures CMake sont retirés. La recherche de voisins conservée est une
-dépendance interne du dual-tree et de l’affectation finale exacte. Le mode
-k-means naïf reste disponible pour la comparaison numérique, dans la même fonction.
-La sérialisation inutilisée est retirée des classes conservées, ce qui supprime
-cereal. La réduction des inclusions supprime aussi ensmallen.
+Le C++ emploie une horloge monotone et des contrôles amortis dans les boucles,
+les distances et les parcours. Les workers OpenMP reçoivent le même budget.
+Les exceptions restent interceptées à l’intérieur de la région parallèle,
+puis relancées sur le thread appelant après la jonction des workers.
 
-Le contrôle [`tools/check-source.py`](https://github.com/milvi/mlpack/blob/codex/kmeans-only/tools/check-source.py)
-vérifie la fermeture exacte des inclusions en modes normal et debug : aucun
-fichier de `src` ne reste hors des dépendances du calcul et du pilote mémoire.
-Les changements de contenu de ces en-têtes invalident le cache Go.
+À expiration : `errors.Is(err, mlpack.ErrTimeLimit)` est vrai, les statistiques
+diagnostiques sont rendues, `Converged` est faux et les slices `Centers` et
+`Labels` sont nil. Une itération interrompue n’est pas comptée. Aucun résultat
+partiel n’est présenté comme une partition complète et aucun calcul natif ne
+continue après le retour. Le CLI émet son JSON avec `timed_out: true` et le
+binaire termine avec le code 124.
 
-## Corrections mémoire conservées
+L’arrêt est **coopératif**, pas une garantie temps réel : une opération mémoire
+indivisible, l’ordonnancement du système et la destruction des ressources peuvent
+faire légèrement dépasser le budget. Le nettoyage n’est jamais interrompu,
+notamment la restauration des enfants masqués des arbres dual-tree.
 
-Le C++ copie les entrées avant tout réordonnancement, écrit dans les slices Go
-et détruit ses ressources avant le retour. Il ne conserve aucun pointeur Go.
-Les sorties sont indépendantes et ne demandent ni `Close` ni libération manuelle.
-L’interface simplifiée n’alloue plus de chaînes C ni de paramètres/modèles opaques.
+## Contrôles exécutés
 
-Les propriétaires uniques des arbres, le nettoyage des constructeurs interrompus,
-les copies et déplacements sûrs des arbres et des bornes et la restauration des
-enfants masqués sur exception restent présents. Le k-means naïf conserve la
-préallocation de ses accumulateurs OpenMP et la collecte des exceptions dans la
-région parallèle. La frontière C intercepte les exceptions ; Go rend `error`.
-Les réglages partagés sont protégés et restaurés au retour.
+Le [rapport local](validation/duree.json) enregistre :
 
-Le [pilote natif](https://github.com/milvi/mlpack/blob/codex/kmeans-only/tests/native_memory.cpp)
-intercepte **390 échecs d’allocation k-means et 639 échecs d’arbres**, avec retour
-exact au nombre initial de `new` actifs après chaque scénario. Le [journal local](validation/asan.log)
-est fourni. AddressSanitizer contrôle les accès mémoire ; UndefinedBehaviorSanitizer
-contrôle les comportements indéfinis. Leur exécution locale a réussi. LeakSanitizer,
-qui détecte les allocations perdues, nécessite les permissions du conteneur Ubuntu.
+- les suites Go, les contrôles de pointeurs renforcés `cgocheck2`, la parité
+  dual-tree/naïf et l’exécution après une erreur ;
+- des expirations réelles sur dual-tree et naïf avec un et deux threads :
+  un budget de 20 ms revient en environ 20–22 ms sur le laboratoire ;
+- une attente de verrou bornée et le refus de durées négatives ;
+- 52 expirations injectées à des contrôles successifs, y compris après des
+  itérations terminées, avec retour exact au nombre initial de `new` actifs ;
+- 390 pannes d’allocation k-means et 639 pannes de construction/affectation
+  d’arbres, contrôlées avec AddressSanitizer et UndefinedBehaviorSanitizer ;
+- 50 expirations répétées : variation native de +6 896 octets, sous le seuil
+  de non-régression de 2 Mio ; les caches de l’allocateur expliquent que cette
+  mesure ne soit pas une preuve de fuite strictement nulle.
 
-Les [tests de restitution](validation/memoire.log), après échauffement,
-ramasse-miettes Go et nettoyage de l’allocateur natif, donnent :
+Le test réel du budget par défaut sur 1 000 000 de points et 10 000 centres
+termine avec `ErrTimeLimit` en **20,054 s**, après **50 itérations terminées**.
+Les données sont uniformes dans le carré unité, graine 42 et un thread.
+Il ne s’agit pas d’un résultat convergé.
 
-| Cas | Variation native |
-|---|---:|
-| 50 appels de 100 000 points | +6 816 octets |
-| 200 calculs interrompus par une erreur C++ | 0 octet |
+## Code et distribution
 
-Le seuil de non-régression est de 2 Mio. Ces variations incluent les caches de
-l’allocateur et ne constituent pas une estimation d’un débit de fuite.
+Le [module natif](https://github.com/milvi/mlpack/tree/codex/kmeans-only) conserve
+une unité C++ et 56 en-têtes nécessaires, dont le contrôle de durée.
+Les copies des entrées, les résultats appartenant à Go, les propriétaires uniques
+des arbres et le nettoyage des constructeurs interrompus restent présents.
+Aucune nouvelle dépendance APT n’est introduite : `build-essential` et
+`libarmadillo-dev` suffisent.
 
-## Calcul et cache vérifiés
-
-Les [tests Go](validation/tests-go.log) et les [contrôles cgo renforcés](validation/tests-cgocheck2.log)
-passent : parité dual-tree/naïf, dimensions 2 et 3, entrées inchangées, sorties
-indépendantes, doublons, un centre, k = n, suppression des centres vides, vues
-Gonum, concurrence, OpenMP et récupération après exception. L’[exemple](validation/exemple.log)
-retrouve trois groupes de trois points en deux itérations.
-
-Une [comparaison avant/après extraction](validation/comparaison.json) sur
-100 000 points, 1 000 centres, graine 42 et budget de 100 itérations donne
-exactement les mêmes nombres de classes et d’itérations, indicateur de convergence,
-inertie et compteur de distances. Elle compare les deux exécutables sur les mêmes données.
-
-| Action sur le cache | Compilations C++ | Temps local |
-|---|---:|---:|
-| Sans modification | 0 | 0,075 s |
-| Horodatage seul | 0 | 0,096 s |
-| Commentaire dans un en-tête imbriqué | 1 | 6,36 s |
-| Contenu restauré | 0 | 0,52 s |
-
-Le [rapport cache](validation/cache.json) et l’[outil](../tools/verify-cache.py)
-vérifient aussi que le témoin de source n’est pas présent dans l’exécutable.
-Les bibliothèques et en-têtes APT restent extérieurs à cette clé : après leur
-modification, forcer `go build -a ./...`.
-
-## Mesures locales de contrôle
-
-Debian 13.6, Go 1.27.3, GCC 14.2, Armadillo 14.2.3 ; paquets extraits dans un
-sysroot sans installation sur l’hôte. Un thread, points uniformes dans le carré
-unité, graine 42, **un seul essai par taille**, budget de 100 itérations.
-Le temps couvre l’appel entier ; la génération des points est exclue. Le pic
-RSS (*Resident Set Size*, mémoire résidente du processus) inclut Go et C++.
-
-| n | k | Temps (s) | Pic RSS (Mio) |
-|---:|---:|---:|---:|
-| 100 000 | 1 000 | 1,639 | 20,89 |
-| 1 000 000 | 1 000 | 8,824 | 160,92 |
-| 1 000 000 | 10 000 | 20,448 | 161,87 |
-
-Pour n multiplié par 10 : temps ×5,38 à k fixé, ×12,47 avec k = n/100 ;
-mémoire ×7,70 et ×7,75. Les trois essais atteignent le budget sans convergence.
-Ces mesures comparent un coût à budget fixé et ne prouvent pas une complexité
-asymptotique. Les [données brutes](validation/mesures.json) et les
-[conditions locales](validation/local.json) sont fournies.
-
-## Validation Ubuntu et distribution
-
-La [validation native Ubuntu 26.04](https://github.com/milvi/mlpack/actions/runs/42468656957)
-a réussi : 55 en-têtes, une seule unité, tests Go, 390 et 639 échecs d’allocation
-interceptés et contrôles mémoire, y compris LeakSanitizer. Le tag natif a été
-créé après succès. Go a ensuite téléchargé le [module publié](validation/module-natif.json)
-et passé [tous les tests du frontend](validation/tests-module-publie.log) avec
-`GOWORK=off`, sans remplacement local.
-
-La [validation Go Ubuntu 26.04](https://github.com/milvi/mlpack-go/actions/runs/42469099355)
-a réussi sur `dd0146e41820151ae913d53d1e1710c4a7a28ada`, puis publié le tag
-`v0.2.0-kmeans.1`. Les contrôles incluent `go mod verify`, les tests Go,
-`cgocheck2`, les restitutions, l’exemple et les mesures. Les variations natives
-Ubuntu sont de +240 octets après 50 appels et +464 octets après 200 erreurs.
-Les [résultats Ubuntu](validation/ubuntu.json) consignent les deux exécutions.
-
-Sur Ubuntu, un essai par taille, graine 42 et budget de 100 itérations :
-
-| n | k | Temps (s) | Pic RSS (Mio) |
-|---:|---:|---:|---:|
-| 100 000 | 1 000 | 1,001 | 23,38 |
-| 1 000 000 | 1 000 | 6,120 | 163,64 |
-| 1 000 000 | 10 000 | 14,187 | 164,73 |
-
-Les trois essais atteignent le budget sans convergence ; mêmes réserves que pour
-les mesures locales. Pour n multiplié par 10, le temps est multiplié par 6,11 à
-k fixé et par 14,17 avec k = n/100 ; la mémoire est multipliée par 7,00 et 7,05.
-
-Les workflows [natif](https://github.com/milvi/mlpack/actions/runs/42468656957) et
-[Go](../.github/workflows/ubuntu2604.yml) construisent dans Ubuntu 26.04 avec
-uniquement `build-essential` et `libarmadillo-dev` comme dépendances C++ de
-développement. Les tests s’exécutent sous un utilisateur ordinaire ; le contrôle
-LeakSanitizer du pilote natif ajoute la capacité `SYS_PTRACE` dans son conteneur.
-Les préversions ne sont créées qu’après succès de l’intégration de leur dépôt.
-
-Un [projet Git neuf](validation/projet-neuf.json), sans workspace ni `replace`,
-a téléchargé les deux modules `v0.2.0-kmeans.1` et Gonum `v0.17.0`, puis exécuté
-`go mod verify`, `go run .` et `go build` avec succès. Son appel sur 10 000 points
-et 10 centres converge en 29 itérations. Le [journal](validation/projet-neuf.log),
-le [go.mod](validation/projet-neuf-go.mod.txt), le [go.sum](validation/projet-neuf-go.sum.txt)
-et le [programme](validation/projet-neuf-main.go.txt) sont conservés. Il utilise
-les variables CGO du laboratoire local ; la validation Ubuntu ci-dessus utilise
-les chemins APT ordinaires.
-Les contrôles portent sur les chemins k-means conservés et leurs utilitaires ;
-ils ne constituent pas une preuve pour toute entrée numérique imaginable.
+Le tag natif est créé après [validation Ubuntu](https://github.com/milvi/mlpack/actions/runs/42656799239).
+Le frontend dépend de cette version exacte et [son workflow](../.github/workflows/ubuntu2604.yml)
+vérifie les sommes des modules, les tests ordinaires, `cgocheck2`, les restitutions,
+l’exemple et les mesures. Les opérations de test et de compilation sont bornées
+à deux minutes. Les résultats de la préversion précédente restent consultables
+[dans son rapport versionné](https://github.com/milvi/mlpack-go/blob/v0.2.0-kmeans.1/docs/corrections-et-validation.md) ;
+leurs budgets de 100 itérations ne décrivent pas le présent contrat temporel.

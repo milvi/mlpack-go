@@ -19,4 +19,4 @@ RUN GOEXPERIMENT=cgocheck2 timeout -k 5s 120s go test -timeout 90s ./...
 RUN timeout -k 5s 120s go test -timeout 90s -tags mlpack_memtest -run TestNative -v .
 RUN timeout -k 5s 120s go build -o /home/mlpack/kmeans ./cmd/kmeans
 RUN timeout -k 5s 120s go run ./examples/kmeans
-CMD ["/home/mlpack/kmeans", "-n", "100000", "-k", "1000", "-iterations", "100"]
+CMD ["/home/mlpack/kmeans", "-n", "100000", "-k", "1000", "-max-duration", "20s"]

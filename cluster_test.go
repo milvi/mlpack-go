@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"sync"
 	"testing"
+	"time"
 
 	"gonum.org/v1/gonum/mat"
 )
@@ -121,9 +122,9 @@ func TestClusterErrors(t *testing.T) {
 		}
 	}
 	opts := DefaultOptions()
-	opts.MaxIterations = -1
+	opts.MaxDuration = -time.Second
 	if _, err := Cluster([]float64{0, 0}, 2, 1, &opts); err == nil {
-		t.Fatal("itérations invalides acceptées")
+		t.Fatal("durée invalide acceptée")
 	}
 }
 

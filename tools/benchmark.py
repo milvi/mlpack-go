@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--binary', required=True)
 parser.add_argument('--output', required=True)
 parser.add_argument('--trials', type=int, default=3)
-parser.add_argument('--iterations', type=int, default=100)
+parser.add_argument('--max-duration', default='20s')
 args = parser.parse_args()
 if args.trials < 1:
     parser.error('au moins une répétition')
@@ -22,8 +22,10 @@ measurements = []
 for n, k in [(100000, 1000), (1000000, 1000), (1000000, 10000)]:
     for trial in range(args.trials):
         command = [str(Path(args.binary).resolve()), '-n', str(n), '-k', str(k),
-                   '-seed', str(42 + trial), '-threads', '1', '-iterations', str(args.iterations)]
-        completed = subprocess.run(command, check=True, text=True, capture_output=True, timeout=120)
+                   '-seed', str(42 + trial), '-threads', '1', '-max-duration', args.max_duration]
+        completed = subprocess.run(command, check=False, text=True, capture_output=True, timeout=120)
+        if completed.returncode not in (0, 124):
+            raise RuntimeError(completed.stderr)
         value = json.loads(completed.stdout)
         measurements.append(value)
         print(json.dumps(value, ensure_ascii=False), flush=True)
@@ -35,19 +37,19 @@ for n, k in [(100000, 1000), (1000000, 1000), (1000000, 10000)]:
         min_seconds=min(v['seconds'] for v in values),
         max_seconds=max(v['seconds'] for v in values),
         median_peak_rss_bytes=statistics.median(v['peak_rss_bytes'] for v in values),
-        median_seconds_per_iteration=statistics.median(v['seconds']/v['iterations'] for v in values),
+        median_seconds_per_iteration=(statistics.median(v['seconds']/v['iterations'] for v in values if v['iterations']) if any(v['iterations'] for v in values) else None),
         iterations=[v['iterations'] for v in values],
-        k_actual=[v['k_actual'] for v in values], converged=[v['converged'] for v in values]))
+        timed_out=[v['timed_out'] for v in values], k_actual=[v['k_actual'] for v in values], converged=[v['converged'] for v in values]))
 reference = summary[0]
 ratios = [dict(case=f'k={v["k"]}', n_ratio=v['n']/reference['n'],
     time_ratio=v['median_seconds']/reference['median_seconds'],
     rss_ratio=v['median_peak_rss_bytes']/reference['median_peak_rss_bytes'],
     effective_time_exponent=math.log10(v['median_seconds']/reference['median_seconds']),
-    per_iteration_time_ratio=v['median_seconds_per_iteration']/reference['median_seconds_per_iteration']) for v in summary[1:]]
+    per_iteration_time_ratio=(v['median_seconds_per_iteration']/reference['median_seconds_per_iteration'] if v['median_seconds_per_iteration'] and reference['median_seconds_per_iteration'] else None)) for v in summary[1:]]
 result = dict(utc=datetime.now(timezone.utc).isoformat(), machine=platform.platform(),
     logical_cpus=__import__('os').cpu_count(), cpu=Path('/proc/cpuinfo').read_text().split('model name\t: ')[-1].splitlines()[0],
-    trials=args.trials, iteration_limit=args.iterations, measurements=measurements, summary=summary, ratios=ratios,
-    interpretation='Le quotient mesure cette distribution et ces convergences ; il ne démontre pas une complexité asymptotique. Le pic RSS inclut Go, C++, le runtime et les entrées/sorties.')
+    trials=args.trials, max_duration=args.max_duration, measurements=measurements, summary=summary, ratios=ratios,
+    interpretation='Le quotient mesure cette distribution et ces budgets temporels ; les résultats interrompus ne contiennent pas de partition ; il ne démontre pas une complexité asymptotique. Le pic RSS inclut Go, C++, le runtime et les entrées/sorties.')
 output = Path(args.output)
 output.parent.mkdir(parents=True, exist_ok=True)
 output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + '\n')

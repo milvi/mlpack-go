@@ -1,6 +1,6 @@
 # K-means pour Go
 
-Branche `codex/kmeans-only` ; préversion **`v0.2.0-kmeans.1`** des deux modules.
+Branche `codex/kmeans-only` ; préversion **`v0.2.0-kmeans.2`** des deux modules.
 Cette branche conserve uniquement k-means de mlpack C++ 4.8.0, compilé
 automatiquement par cgo : **une unité C++ au lieu de 49**.
 
@@ -11,7 +11,7 @@ Avec Go 1.27.3 ou ultérieur installé et depuis un projet possédant son `go.mo
 ```sh
 sudo apt-get update
 sudo apt-get install --no-install-recommends build-essential libarmadillo-dev ca-certificates
-go get github.com/milvi/mlpack-go@v0.2.0-kmeans.1
+go get github.com/milvi/mlpack-go@v0.2.0-kmeans.2
 ```
 
 Cette préversion se demande explicitement ; `@latest` privilégie la version
@@ -43,7 +43,7 @@ func main() {
 ```
 
 Une ligne est un point : le tableau contient n × dimensions coordonnées.
-Par défaut : dual-tree avec KD-tree, graine 42, au plus 1 000 itérations, seuil
+Par défaut : dual-tree avec KD-tree, graine 42, un budget de 20 secondes, seuil
 global de déplacement des centres 10⁻⁵ et un thread. `DefaultOptions` permet de
 changer ces valeurs ; `InitialCentroids` fournit une initialisation explicite.
 `Algorithm: "naive"` garde le Lloyd naïf comme référence via la même fonction.
@@ -52,7 +52,13 @@ changer ces valeurs ; `InitialCentroids` fournit une initialisation explicite.
 Les entrées restent inchangées. Le C++ copie les données, calcule, écrit les
 sorties et détruit ses ressources avant le retour. Les résultats appartiennent
 à Go ; aucun pointeur natif à restituer, aucun `Close`. Les erreurs C++ deviennent
-`error`. `Converged == false` signale un budget atteint et doit être examiné.
+`error`. Le budget `MaxDuration` inclut préparation et attente du verrou.
+À expiration, `errors.Is(err, mlpack.ErrTimeLimit)` est vrai et seules les
+statistiques, dont `Iterations`, sont conservées ; les slices du résultat sont
+nil et `Converged` est faux. Aucun plafond d’itérations n’est utilisé.
+L’arrêt est coopératif dans le C++ : une opération mémoire indivisible et la
+destruction des ressources peuvent faire légèrement dépasser le budget.
+Le calcul natif est terminé avant le retour, sans goroutine abandonnée.
 Les coordonnées et calculs doivent rester finis ; réduire leur échelle si nécessaire.
 
 Les centres vides restent en place pendant les itérations, puis sont retirés au
@@ -66,7 +72,7 @@ et de journalisation, restaurés au retour.
 
 ```sh
 go run ./examples/kmeans
-go run ./cmd/kmeans -n 100000 -k 1000 -iterations 100
+go run ./cmd/kmeans -n 100000 -k 1000 -max-duration 20s
 ```
 
 `go run` compile dans un répertoire temporaire et utilise le cache Go, sans
@@ -76,7 +82,20 @@ laisser d’exécutable dans le projet. Pour produire un binaire explicitement :
 go build -o /tmp/kmeans-exemple ./examples/kmeans
 /tmp/kmeans-exemple
 go build -o /tmp/kmeans ./cmd/kmeans
-/tmp/kmeans -n 1000000 -k 1000 -iterations 100
+/tmp/kmeans -n 1000000 -k 1000 -max-duration 20s
+```
+
+La commande rend du JSON, y compris à expiration (`timed_out: true`, code de
+sortie 124 pour le binaire). `iterations` compte les tours terminés ; aucun
+résultat partiel n’est présenté comme une partition valide.
+
+```go
+options := mlpack.DefaultOptions()
+options.MaxDuration = 5 * time.Second // import "time"
+resultat, err := mlpack.Cluster(points, 2, 100, &options)
+if errors.Is(err, mlpack.ErrTimeLimit) { // import "errors"
+    fmt.Println("Budget atteint après", resultat.Iterations, "itérations")
+}
 ```
 
 ## Installation, compilation et fichiers

@@ -2,7 +2,7 @@
 
 Les deux branches sont `codex/kmeans-only`. Les modules restent
 `github.com/milvi/mlpack` pour le C++ et `github.com/milvi/mlpack-go` pour l’interface
-utilisateur. La préversion est `v0.2.0-kmeans.1`, distincte de mlpack amont 4.8.0.
+utilisateur. La préversion est `v0.2.0-kmeans.2`, distincte de mlpack amont 4.8.0.
 Les tags publiés sont immuables ; le développement avance par nouveaux commits.
 
 1. Modifier directement le C++ dans `milvi/mlpack`, puis lancer
@@ -22,7 +22,7 @@ Les tags publiés sont immuables ; le développement avance par nouveaux commits
    avant de publier la version correspondante du module utilisateur.
 
 Pour cette première réduction, le job de publication de chaque workflow crée
-`v0.2.0-kmeans.1` sur la branche après succès de l’intégration Ubuntu. Un tag
+`v0.2.0-kmeans.2` sur la branche après succès de l’intégration Ubuntu. Un tag
 déjà présent est conservé ; les publications suivantes choisissent une nouvelle
 version. `@latest` ne sélectionne pas cette préversion tant qu’une version stable
 existe. Les branches `master` et les versions stables existantes restent disponibles.

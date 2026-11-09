@@ -3,6 +3,7 @@ package mlpack
 import (
 	"fmt"
 	"math/rand/v2"
+	"time"
 
 	native "github.com/milvi/mlpack"
 	"gonum.org/v1/gonum/mat"
@@ -12,24 +13,28 @@ import (
 type Options struct {
 	Algorithm         string
 	Seed              uint64
-	MaxIterations     int
+	MaxDuration       time.Duration // 0 choisit 20 s ; une durée négative est refusée.
 	Tolerance         float64
 	Threads           int
 	InitialCentroids  []float64
 	KeepEmptyClusters bool
 }
 
+// ErrTimeLimit est reconnu avec errors.Is ; aucun résultat partiel n’est exposé.
+var ErrTimeLimit = native.ErrTimeLimit
+
 // Result contient exclusivement des slices Go ; aucun Close n’est nécessaire.
 type Result = native.Result
 
 // DefaultOptions choisit dual-tree avec KD-tree, une graine fixe et un thread.
 func DefaultOptions() Options {
-	return Options{Algorithm: "dualtree", Seed: 42, MaxIterations: 1000, Tolerance: 1e-5, Threads: 1}
+	return Options{Algorithm: "dualtree", Seed: 42, MaxDuration: 20 * time.Second, Tolerance: 1e-5, Threads: 1}
 }
 
 // Cluster traite des points contigus n × dimensions. Les entrées restent inchangées.
 // Les centres vides sont conservés pendant les itérations, puis supprimés à la fin.
 func Cluster(points []float64, dimensions, clusters int, options *Options) (Result, error) {
+	started := time.Now()
 	if dimensions <= 0 || len(points) == 0 || len(points)%dimensions != 0 ||
 		clusters <= 0 || clusters > len(points)/dimensions {
 		return Result{}, fmt.Errorf("mlpack : dimensions ou nombre de classes invalides")
@@ -41,8 +46,11 @@ func Cluster(points []float64, dimensions, clusters int, options *Options) (Resu
 	if o.Algorithm == "" {
 		o.Algorithm = "dualtree"
 	}
-	if o.MaxIterations == 0 {
-		o.MaxIterations = 1000
+	if o.MaxDuration == 0 {
+		o.MaxDuration = 20 * time.Second
+	}
+	if o.MaxDuration < 0 {
+		return Result{}, fmt.Errorf("mlpack : durée maximale invalide")
 	}
 	if o.Tolerance == 0 {
 		o.Tolerance = 1e-5
@@ -66,6 +74,9 @@ func Cluster(points []float64, dimensions, clusters int, options *Options) (Resu
 		selected := make(map[int]int, clusters)
 		n := len(points) / dimensions
 		for i := 0; i < clusters; i++ {
+			if i&255 == 0 && time.Since(started) >= o.MaxDuration {
+				return Result{}, ErrTimeLimit
+			}
 			j := i + random.IntN(n-i)
 			value, ok := selected[j]
 			if !ok {
@@ -79,11 +90,26 @@ func Cluster(points []float64, dimensions, clusters int, options *Options) (Resu
 			copy(initial[i*dimensions:(i+1)*dimensions], points[value*dimensions:(value+1)*dimensions])
 		}
 	}
-	return native.KMeans(points, dimensions, clusters, initial, o.MaxIterations, o.Tolerance, algorithm, o.Threads, o.KeepEmptyClusters)
+	remaining := o.MaxDuration - time.Since(started)
+	if remaining <= 0 {
+		return Result{}, ErrTimeLimit
+	}
+	return native.KMeans(points, dimensions, clusters, initial, remaining, o.Tolerance, algorithm, o.Threads, o.KeepEmptyClusters)
 }
 
 // ClusterDense accepte aussi les vues Gonum non contiguës.
 func ClusterDense(points *mat.Dense, clusters int, options *Options) (Result, error) {
+	started := time.Now()
+	o := DefaultOptions()
+	if options != nil {
+		o = *options
+	}
+	if o.MaxDuration == 0 {
+		o.MaxDuration = 20 * time.Second
+	}
+	if o.MaxDuration < 0 {
+		return Result{}, fmt.Errorf("mlpack : durée maximale invalide")
+	}
 	if points == nil {
 		return Result{}, fmt.Errorf("mlpack : matrice absente")
 	}
@@ -96,10 +122,17 @@ func ClusterDense(points *mat.Dense, clusters int, options *Options) (Result, er
 	if raw.Stride != c && r != 1 {
 		data = make([]float64, r*c)
 		for i := 0; i < r; i++ {
+			if i&255 == 0 && time.Since(started) >= o.MaxDuration {
+				return Result{}, ErrTimeLimit
+			}
 			copy(data[i*c:(i+1)*c], raw.Data[i*raw.Stride:i*raw.Stride+c])
 		}
 	} else {
 		data = data[:r*c]
 	}
-	return Cluster(data, c, clusters, options)
+	o.MaxDuration -= time.Since(started)
+	if o.MaxDuration <= 0 {
+		return Result{}, ErrTimeLimit
+	}
+	return Cluster(data, c, clusters, &o)
 }

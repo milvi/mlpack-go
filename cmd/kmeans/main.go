@@ -3,6 +3,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"math/rand/v2"
@@ -21,7 +22,8 @@ type Measurement struct {
 	Seed                 uint64  `json:"seed"`
 	Algorithm            string  `json:"algorithm"`
 	Threads              int     `json:"threads"`
-	IterationLimit       int     `json:"iteration_limit"`
+	DurationLimitSeconds float64 `json:"duration_limit_seconds"`
+	TimedOut             bool    `json:"timed_out"`
 	Iterations           int     `json:"iterations"`
 	Converged            bool    `json:"converged"`
 	Seconds              float64 `json:"seconds"`
@@ -36,11 +38,11 @@ func main() {
 	k := flag.Int("k", 1000, "nombre maximal de classes")
 	seed := flag.Uint64("seed", 42, "graine reproductible")
 	threads := flag.Int("threads", 1, "threads OpenMP")
-	iterations := flag.Int("iterations", 1000, "limite d’itérations")
+	maxDuration := flag.Duration("max-duration", 20*time.Second, "durée maximale du calcul (ex. 20s, 500ms)")
 	algorithm := flag.String("algorithm", "dualtree", "dualtree ou naive")
 	flag.Parse()
-	if *n < 1 || *n > int(^uint(0)>>1)/2 {
-		fmt.Fprintln(os.Stderr, "n invalide")
+	if *maxDuration <= 0 || *n < 1 || *n > int(^uint(0)>>1)/2 {
+		fmt.Fprintln(os.Stderr, "n ou durée invalide")
 		os.Exit(2)
 	}
 	data := make([]float64, *n*2)
@@ -49,12 +51,13 @@ func main() {
 		data[i] = rng.Float64()
 	}
 	options := mlpack.DefaultOptions()
-	options.Seed, options.Threads, options.MaxIterations, options.Algorithm = *seed, *threads, *iterations, *algorithm
+	options.Seed, options.Threads, options.MaxDuration, options.Algorithm = *seed, *threads, *maxDuration, *algorithm
 	runtime.GC()
 	start := time.Now()
 	result, err := mlpack.Cluster(data, 2, *k, &options)
 	elapsed := time.Since(start)
-	if err != nil {
+	timedOut := errors.Is(err, mlpack.ErrTimeLimit)
+	if err != nil && !timedOut {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
@@ -77,10 +80,19 @@ func main() {
 	if err := syscall.Getrusage(syscall.RUSAGE_SELF, &usage); err != nil {
 		panic(err)
 	}
-	measurement := Measurement{*n, *k, result.Clusters, *seed, *algorithm, *threads, *iterations, result.Iterations, result.Converged, elapsed.Seconds(), usage.Maxrss * 1024, memory.HeapAlloc, result.Inertia, result.DistanceCalculations}
+	measurement := Measurement{
+		N: *n, K: *k, KActual: result.Clusters, Seed: *seed,
+		Algorithm: *algorithm, Threads: *threads, DurationLimitSeconds: maxDuration.Seconds(),
+		TimedOut: timedOut, Iterations: result.Iterations, Converged: result.Converged,
+		Seconds: elapsed.Seconds(), PeakRSSBytes: usage.Maxrss * 1024, HeapAllocBytes: memory.HeapAlloc,
+		Inertia: result.Inertia, DistanceCalculations: result.DistanceCalculations,
+	}
 	if err := json.NewEncoder(os.Stdout).Encode(measurement); err != nil {
 		panic(err)
 	}
 	runtime.KeepAlive(data)
 	runtime.KeepAlive(result)
+	if timedOut {
+		os.Exit(124)
+	}
 }

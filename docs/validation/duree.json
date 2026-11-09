@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-09",
+  "version": "v0.2.0-kmeans.2",
+  "cpp_commit": "c8dfa7728aa841c00fcba0a0a0abfacbbf791147",
+  "default_duration_seconds": 20,
+  "cli": {
+    "n": 1000000,
+    "k_requested": 10000,
+    "k_actual": 0,
+    "seed": 42,
+    "algorithm": "dualtree",
+    "threads": 1,
+    "duration_limit_seconds": 20,
+    "timed_out": true,
+    "iterations": 50,
+    "converged": false,
+    "seconds": 20.054010424,
+    "peak_rss_bytes": 162807808,
+    "go_heap_alloc_bytes": 16238448,
+    "inertia": 0,
+    "distance_calculations": 126374959
+  },
+  "allocation_failures": 390,
+  "tree_failures": 639,
+  "injected_timeouts": 52,
+  "native_bytes_after_50_timeouts": 6896,
+  "checks": [
+    "tests Go",
+    "cgocheck2",
+    "ASan et UBSan",
+    "durées de 20 ms sur dual-tree et naïf, 1 et 2 threads",
+    "attente du verrou bornée",
+    "sorties absentes sur erreur"
+  ],
+  "local_environment": "Debian 13.6, Go 1.27.3, GCC 14.2, Armadillo 14.2.3 ; sysroot de laboratoire. LSan vérifié séparément sur Ubuntu.",
+  "semantics": "Arrêt coopératif ; opérations mémoire indivisibles et nettoyage après expiration peuvent prolonger le retour. Aucun calcul ne continue après le retour."
+}
