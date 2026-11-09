@@ -24,8 +24,11 @@ puis relancées sur le thread appelant après la jonction des workers.
 diagnostiques sont rendues, `Converged` est faux et les slices `Centers` et
 `Labels` sont nil. Une itération interrompue n’est pas comptée. Aucun résultat
 partiel n’est présenté comme une partition complète et aucun calcul natif ne
-continue après le retour. Le CLI émet son JSON avec `timed_out: true` et le
-binaire termine avec le code 124.
+continue après le retour. Depuis la préversion Go `v0.2.0-kmeans.3`, le CLI affiche par défaut un bilan
+lisible en français, avec un état d’interruption explicite. L’expiration prévue
+termine ce mode humain avec le code 0. L’option `-json` conserve le format machine,
+`timed_out: true` et le code 124 pour le binaire. Le contrat `ErrTimeLimit` de
+l’API Go reste celui décrit ci-dessus.
 
 L’arrêt est **coopératif**, pas une garantie temps réel : une opération mémoire
 indivisible, l’ordonnancement du système et la destruction des ressources peuvent

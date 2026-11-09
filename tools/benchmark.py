@@ -22,7 +22,7 @@ measurements = []
 for n, k in [(100000, 1000), (1000000, 1000), (1000000, 10000)]:
     for trial in range(args.trials):
         command = [str(Path(args.binary).resolve()), '-n', str(n), '-k', str(k),
-                   '-seed', str(42 + trial), '-threads', '1', '-max-duration', args.max_duration]
+                   '-seed', str(42 + trial), '-threads', '1', '-max-duration', args.max_duration, '-json']
         completed = subprocess.run(command, check=False, text=True, capture_output=True, timeout=120)
         if completed.returncode not in (0, 124):
             raise RuntimeError(completed.stderr)

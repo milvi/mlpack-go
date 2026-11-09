@@ -1,6 +1,7 @@
 # K-means pour Go
 
-Branche `codex/kmeans-only` ; préversion **`v0.2.0-kmeans.2`** des deux modules.
+Branche `codex/kmeans-only` ; préversion Go **`v0.2.0-kmeans.3`**, avec le module
+natif `v0.2.0-kmeans.2`. Les deux modules évoluent indépendamment.
 Cette branche conserve uniquement k-means de mlpack C++ 4.8.0, compilé
 automatiquement par cgo : **une unité C++ au lieu de 49**.
 
@@ -11,7 +12,7 @@ Avec Go 1.27.3 ou ultérieur installé et depuis un projet possédant son `go.mo
 ```sh
 sudo apt-get update
 sudo apt-get install --no-install-recommends build-essential libarmadillo-dev ca-certificates
-go get github.com/milvi/mlpack-go@v0.2.0-kmeans.2
+go get github.com/milvi/mlpack-go@v0.2.0-kmeans.3
 ```
 
 Cette préversion se demande explicitement ; `@latest` privilégie la version
@@ -85,9 +86,42 @@ go build -o /tmp/kmeans ./cmd/kmeans
 /tmp/kmeans -n 1000000 -k 1000 -max-duration 20s
 ```
 
-La commande rend du JSON, y compris à expiration (`timed_out: true`, code de
-sortie 124 pour le binaire). `iterations` compte les tours terminés ; aucun
+La commande affiche par défaut un bilan en français : état du calcul, nombres
+regroupés, temps avec unités et mémoire en Kio/Mio/Gio. Le pic mémoire couvre le
+processus entier ; le tas Go est mesuré après le calcul. Quand le budget est
+atteint, le bilan indique les tours terminés et l’absence de partition. Cet
+arrêt prévu termine le mode humain avec le code 0, pour éviter le message
+`exit status 124` de `go run`.
+
+Exemple de présentation sur 10 000 points (les mesures dépendent de la machine) :
+
+```text
+K-means — dual-tree / KD-tree
+Points uniformes dans le carré [0, 1]²
+
+  État                Convergence atteinte
+
+  Points              10 000
+  Classes             10 obtenues / 10 demandées
+  Exécution           1 thread · graine 42
+
+  Temps de calcul     25,27 ms / budget 20 s
+  Tours terminés      29
+  Pic mémoire         9,12 Mio (processus entier)
+  Tas Go              460,63 Kio (après calcul)
+
+  Inertie             167,650195
+  Distances comptées  282 907
+```
+
+Pour les scripts, l’option **`-json`** conserve le schéma machine et le code 124
+à expiration, avec `timed_out: true`. Les erreurs de calcul ou d’arguments restent
+des échecs dans les deux modes. `iterations` compte les tours terminés ; aucun
 résultat partiel n’est présenté comme une partition valide.
+
+```sh
+go run ./cmd/kmeans -n 100000 -k 1000 -max-duration 20s -json
+```
 
 ```go
 options := mlpack.DefaultOptions()

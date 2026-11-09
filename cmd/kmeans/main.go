@@ -40,9 +40,10 @@ func main() {
 	threads := flag.Int("threads", 1, "threads OpenMP")
 	maxDuration := flag.Duration("max-duration", 20*time.Second, "durée maximale du calcul (ex. 20s, 500ms)")
 	algorithm := flag.String("algorithm", "dualtree", "dualtree ou naive")
+	jsonOutput := flag.Bool("json", false, "sortie JSON pour les scripts (code 124 si le budget est atteint)")
 	flag.Parse()
 	if *maxDuration <= 0 || *n < 1 || *n > int(^uint(0)>>1)/2 {
-		fmt.Fprintln(os.Stderr, "n ou durée invalide")
+		fmt.Fprintln(os.Stderr, "Le nombre de points et la durée maximale doivent être positifs et représentables.")
 		os.Exit(2)
 	}
 	data := make([]float64, *n*2)
@@ -62,15 +63,17 @@ func main() {
 		os.Exit(1)
 	}
 	counts := make([]int, result.Clusters)
-	for _, label := range result.Labels {
+	for i, label := range result.Labels {
 		if label < 0 || label >= len(counts) {
-			panic("étiquette invalide")
+			fmt.Fprintf(os.Stderr, "Résultat incohérent : classe %d invalide au point %d.\n", label, i)
+			os.Exit(1)
 		}
 		counts[label]++
 	}
 	for _, count := range counts {
 		if count == 0 {
-			panic("classe vide")
+			fmt.Fprintln(os.Stderr, "Résultat incohérent : une classe vide est présente.")
+			os.Exit(1)
 		}
 	}
 	runtime.GC()
@@ -78,7 +81,8 @@ func main() {
 	runtime.ReadMemStats(&memory)
 	var usage syscall.Rusage
 	if err := syscall.Getrusage(syscall.RUSAGE_SELF, &usage); err != nil {
-		panic(err)
+		fmt.Fprintln(os.Stderr, "Impossible de mesurer la mémoire du processus :", err)
+		os.Exit(1)
 	}
 	measurement := Measurement{
 		N: *n, K: *k, KActual: result.Clusters, Seed: *seed,
@@ -87,12 +91,19 @@ func main() {
 		Seconds: elapsed.Seconds(), PeakRSSBytes: usage.Maxrss * 1024, HeapAllocBytes: memory.HeapAlloc,
 		Inertia: result.Inertia, DistanceCalculations: result.DistanceCalculations,
 	}
-	if err := json.NewEncoder(os.Stdout).Encode(measurement); err != nil {
-		panic(err)
+	var outputError error
+	if *jsonOutput {
+		outputError = json.NewEncoder(os.Stdout).Encode(measurement)
+	} else {
+		outputError = writeReport(os.Stdout, measurement)
+	}
+	if outputError != nil {
+		fmt.Fprintln(os.Stderr, "Impossible d’afficher le résultat :", outputError)
+		os.Exit(1)
 	}
 	runtime.KeepAlive(data)
 	runtime.KeepAlive(result)
-	if timedOut {
+	if timedOut && *jsonOutput {
 		os.Exit(124)
 	}
 }

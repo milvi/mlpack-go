@@ -40,7 +40,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          version=v0.2.0-kmeans.2
+          version=v0.2.0-kmeans.3
           if git show-ref --verify --quiet "refs/tags/$version"; then
             git merge-base --is-ancestor "$(git rev-parse "$version^{commit}")" "$GITHUB_SHA"
             echo "Préversion déjà publiée ; son tag reste inchangé."
